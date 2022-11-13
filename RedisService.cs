@@ -91,7 +91,7 @@ namespace GeradorDeDados
         {
             var value = _redisCache.GetString(chave);
 
-            if (value != null && index != -1)
+            if (value != null)
             {
                 var lista = JsonSerializer.Deserialize<List<T>>(value);
                 lista.RemoveAt(index);

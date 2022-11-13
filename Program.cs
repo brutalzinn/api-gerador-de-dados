@@ -45,7 +45,7 @@ if (config.GetSection("Swagger").Get<bool>())
 app.MapGet("/obterCNPJValido/{unicoSocio}", ([FromRoute] bool unicoSocio, [FromServices] IRedisService redisService) =>
 {
     var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs").ToList();
-    var CNPJValido = listaCNPJValido.FirstOrDefault(x => x.Qsa.Count > 1);
+    var CNPJValido = listaCNPJValido.FirstOrDefault(x => x.Qsa.Count != 1);
 
     if (unicoSocio)
     {
@@ -54,7 +54,10 @@ app.MapGet("/obterCNPJValido/{unicoSocio}", ([FromRoute] bool unicoSocio, [FromS
     var resultado = CNPJValido;
 
     var removeIndex = listaCNPJValido.IndexOf(CNPJValido);
-    redisService.ItemRemove<ReceitaWSResponse>("cnpjs", removeIndex);
+    if (removeIndex != -1)
+    {
+        redisService.ItemRemove<ReceitaWSResponse>("cnpjs", removeIndex);
+    }
 
     return Results.Ok(resultado);
 }).WithTags("Geradores");
