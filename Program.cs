@@ -45,7 +45,7 @@ if (config.GetSection("Swagger").Get<bool>())
 app.MapGet("/obterCNPJValido/{unicoSocio}", ([FromRoute] bool unicoSocio, [FromServices] IRedisService redisService) =>
 {
     var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs").ToList();
-    var CNPJValido = listaCNPJValido.FirstOrDefault();
+    var CNPJValido = listaCNPJValido.FirstOrDefault(x => x.Qsa.Count > 1);
 
     if (unicoSocio)
     {
