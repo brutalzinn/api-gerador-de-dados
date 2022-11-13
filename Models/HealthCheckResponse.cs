@@ -6,6 +6,8 @@
         public string UpTime { get; set; }
         public string Ambiente { get; set; }
 
+        public bool WorkerAtivo { get; set; }
+
         public int CnpjsRegistrados { get; set; }
     }
 }

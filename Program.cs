@@ -2,8 +2,8 @@ using ConfigurationSubstitution;
 using GeradorDeDados;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
+using GeradorDeDados.Services;
 using Microsoft.AspNetCore.Mvc;
-using MinecraftServer.Api.Models;
 using RestEase.HttpClientFactory;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +22,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IRedisService, RedisService>();
 builder.Services.AddHostedService<CNPJBackgroundWorker>();
 builder.Services.AddRestEaseClient<IReceitaWS>("https://receitaws.com.br");
-builder.Services.AddSingleton<ApiCicloDeVida>();
+builder.Services.AddSingleton<ApiCicloDeVidaService>();
+builder.Services.AddSingleton<ConfigReceitaWSService>();
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -58,7 +59,7 @@ app.MapGet("/obterCNPJValido/{unicoSocio}", ([FromRoute] bool unicoSocio, [FromS
     return Results.Ok(resultado);
 }).WithTags("Geradores");
 
-app.MapGet("/", ([FromServices] ApiCicloDeVida apiCicloDeVida, [FromServices] IRedisService redisService) =>
+app.MapGet("/", ([FromServices] ApiCicloDeVidaService apiCicloDeVida, [FromServices] ConfigReceitaWSService configReceitaWSService, [FromServices] IRedisService redisService) =>
 {
     var ultimoDeploy = "Último deploy " + apiCicloDeVida.iniciouEm.ToString("dd/MM/yyyy HH:mm:ss");
     var upTime = DateTime.Now.Subtract(apiCicloDeVida.iniciouEm).ToString("c");
@@ -68,11 +69,18 @@ app.MapGet("/", ([FromServices] ApiCicloDeVida apiCicloDeVida, [FromServices] IR
     {
         UltimoDeploy = ultimoDeploy,
         UpTime = upTime,
+        WorkerAtivo = configReceitaWSService.WorkerAtivo,
         CnpjsRegistrados = cnpjsRegistrados,
         Ambiente = ambiente
 
     });
 }).WithTags("Health Check");
+
+app.MapPost("/ReceitaWSBackgroundWorker", ([FromBody] ConfigReceitaWSRequest request, [FromServices] ConfigReceitaWSService configReceitaWSService, [FromServices] IRedisService redisService) =>
+{
+    configReceitaWSService.WorkerAtivo = request.WorkerAtivo;
+    return Results.Ok();
+}).WithTags("ReceitaWS");
 
 string ObterRedisContext()
 {
