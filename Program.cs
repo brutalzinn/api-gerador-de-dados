@@ -33,7 +33,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (config.GetSection("Swagger").Get<bool>())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
