@@ -1,0 +1,102 @@
+﻿using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
+
+namespace GeradorDeDados
+{
+    public class RedisService : IRedisService
+    {
+        private readonly IDistributedCache _redisCache;
+
+        public RedisService(IDistributedCache redisDatabase)
+        {
+            _redisCache = redisDatabase;
+        }
+
+        public T Get<T>(string chave)
+        {
+            var value = _redisCache.GetString(chave);
+
+            if (value != null)
+            {
+                return JsonSerializer.Deserialize<T>(value);
+            }
+            return default;
+
+        }
+
+        public T Set<T>(string chave, T valor, int expiracao)
+        {
+            var timeOut = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24),
+                SlidingExpiration = TimeSpan.FromSeconds(expiracao)
+            };
+
+            _redisCache.SetString(chave, JsonSerializer.Serialize(valor), timeOut);
+            return valor;
+        }
+
+        public T Set<T>(string chave, T valor)
+        {
+            _redisCache.SetString(chave, JsonSerializer.Serialize(valor));
+            return valor;
+        }
+
+        public bool Clear(string chave)
+        {
+            _redisCache.Remove(chave);
+            return default;
+        }
+
+        public bool Exists(string chave)
+        {
+            return _redisCache.Get(chave) != null;
+        }
+
+        /// <summary>
+        /// Usar apenas para cache de listas
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="chave"></param>
+        /// <param name="valor"></param>
+        /// <returns></returns>
+        public T ItemAdd<T>(string chave, T valor)
+        {
+            var value = _redisCache.GetString(chave);
+
+            if (value != null)
+            {
+                var lista = JsonSerializer.Deserialize<List<T>>(value);
+                lista.Add(valor);
+                _redisCache.SetString(chave, JsonSerializer.Serialize(lista));
+            }
+            else
+            {
+                var lista = new List<T>();
+                lista.Add(valor);
+                _redisCache.SetString(chave, JsonSerializer.Serialize(lista));
+            }
+            return default;
+        }
+
+
+        /// <summary>
+        /// Usar apenas para cache de listas
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="chave"></param>
+        /// <param name="valor"></param>
+        /// <returns></returns>
+        public void ItemRemove<T>(string chave, int index)
+        {
+            var value = _redisCache.GetString(chave);
+
+            if (value != null)
+            {
+                var lista = JsonSerializer.Deserialize<List<T>>(value);
+                lista.RemoveAt(index);
+                _redisCache.SetString(chave, JsonSerializer.Serialize(lista));
+            }
+        }
+    }
+}

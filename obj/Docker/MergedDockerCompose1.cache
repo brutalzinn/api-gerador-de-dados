@@ -1,0 +1,86 @@
+name: dockercompose12848512349001930500
+services:
+  geradordedados:
+    build:
+      context: C:\Users\rober\source\repos\GeradorDeDados
+      dockerfile: Dockerfile
+      labels:
+        com.microsoft.created-by: visual-studio
+        com.microsoft.visual-studio.project-name: GeradorDeDados
+      target: base
+    container_name: GeradorDeDados
+    depends_on:
+      redis_service:
+        condition: service_started
+    entrypoint:
+    - tail
+    - -f
+    - /dev/null
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS: "true"
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      NUGET_FALLBACK_PACKAGES: ""
+    image: geradordedados:dev
+    labels:
+      com.microsoft.visualstudio.debuggee.arguments: ' --additionalProbingPath /root/.nuget/packages  "/app/bin/Debug/net7.0/GeradorDeDados.dll"'
+      com.microsoft.visualstudio.debuggee.killprogram: /bin/sh -c "if PID=$$(pidof
+        dotnet); then kill $$PID; fi"
+      com.microsoft.visualstudio.debuggee.program: dotnet
+      com.microsoft.visualstudio.debuggee.workingdirectory: /app
+    links:
+    - redis_service
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "5555"
+      protocol: tcp
+    tty: true
+    volumes:
+    - type: bind
+      source: C:\Users\rober\source\repos\GeradorDeDados
+      target: /app
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\rober\source\repos\GeradorDeDados
+      target: /src
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\rober\vsdbg\vs2017u5
+      target: /remote_debugger
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\rober\.nuget\packages\
+      target: /root/.nuget/packages
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\rober\AppData\Roaming/ASP.NET/Https
+      target: /root/.aspnet/https
+      read_only: true
+      bind:
+        create_host_path: true
+    - type: bind
+      source: C:\Users\rober\AppData\Roaming/Microsoft/UserSecrets
+      target: /root/.microsoft/usersecrets
+      read_only: true
+      bind:
+        create_host_path: true
+  redis_service:
+    image: redis:6.2-alpine
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 6379
+      published: "6379"
+      protocol: tcp
+networks:
+  default:
+    name: dockercompose12848512349001930500_default

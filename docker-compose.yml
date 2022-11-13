@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  geradordedados:
+    image: ${DOCKER_REGISTRY-}geradordedados
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5555:80"
+    links:
+    - "redis_service"
+    depends_on:
+    - "redis_service"
+
+
+  redis_service:
+    image: redis:6.2-alpine
+    ports:
+    - "6379:6379"
