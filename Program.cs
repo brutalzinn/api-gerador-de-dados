@@ -112,7 +112,13 @@ internal class Program
 
         app.MapGet("/obterCNPJValido/{unicoSocio}", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromRoute] bool unicoSocio, [FromServices] IRedisService redisService) =>
         {
-            var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs").ToList();
+            var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
+
+            if (listaCNPJValido == null)
+            {
+                return Results.Ok("Nenhuma empresa disponível.");
+            }
+
             var CNPJValido = listaCNPJValido.FirstOrDefault();
 
             if (unicoSocio)
@@ -124,19 +130,13 @@ internal class Program
                 }
             }
 
-            if (CNPJValido == null)
-            {
-                return Results.Ok("Nenhuma empresa encontrada.");
-            }
-            var resultado = CNPJValido;
-
             var removeIndex = listaCNPJValido.IndexOf(CNPJValido);
             if (removeIndex != -1)
             {
                 redisService.ItemRemove<ReceitaWSResponse>("cnpjs", removeIndex);
             }
 
-            return Results.Ok(resultado);
+            return Results.Ok(CNPJValido);
         }).WithTags("Geradores");
 
         app.MapGet("/", ([FromServices] ApiCicloDeVidaService apiCicloDeVida, [FromServices] ConfigReceitaWSService configReceitaWSService, [FromServices] IRedisService redisService) =>
@@ -144,7 +144,12 @@ internal class Program
             var ultimoDeploy = "Último deploy " + apiCicloDeVida.iniciouEm.ToString("dd/MM/yyyy HH:mm:ss");
             var upTime = DateTime.Now.Subtract(apiCicloDeVida.iniciouEm).ToString("c");
             var ambiente = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            var cnpjsRegistrados = redisService.Get<List<ReceitaWSResponse>>("cnpjs").ToList().Count;
+            var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
+            int cnpjsRegistrados = 0;
+            if (listaCNPJValido != null)
+            {
+                cnpjsRegistrados = redisService.Get<List<ReceitaWSResponse>>("cnpjs").ToList().Count;
+            }
             return Results.Ok(new HealthCheckResponse()
             {
                 UltimoDeploy = ultimoDeploy,
