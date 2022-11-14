@@ -123,7 +123,7 @@ internal class Program
 
             if (unicoSocio)
             {
-                CNPJValido = listaCNPJValido.FirstOrDefault(x => x.Qsa.Count == 1);
+                CNPJValido = listaCNPJValido.FirstOrDefault(x => x.Qsa != null && x.Qsa.Count == 1);
                 if (CNPJValido == null)
                 {
                     return Results.Ok("Nenhuma empresa com único sócio encontrada.");
