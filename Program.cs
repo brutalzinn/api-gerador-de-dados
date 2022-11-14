@@ -8,8 +8,10 @@ using GeradorDeDados.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using RestEase.HttpClientFactory;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 internal class Program
 {
@@ -42,9 +44,11 @@ internal class Program
                     .EnableSubstitutions("%", "%")
                     .Build();
 
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
+            c.SchemaFilter<EnumSchemaFilter>();
             c.SwaggerDoc("v1", info);
             c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
             {
@@ -110,56 +114,63 @@ internal class Program
 
         //app.UseHttpsRedirection();
 
-        app.MapGet("/obterCNPJValido/{unicoSocio}", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromRoute] bool unicoSocio, [FromServices] IRedisService redisService) =>
+        app.MapGet("/obterCNPJValido/{filtroSocio}", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromRoute] FiltroSocio filtroSocio, [FromServices] IRedisService redisService) =>
         {
             var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
-
             if (listaCNPJValido == null)
             {
                 return Results.Ok("Nenhuma empresa disponível.");
             }
-
-            var CNPJValido = listaCNPJValido.FirstOrDefault();
-
-            if (unicoSocio)
+            ReceitaWSResponse CNPJEncontrado = null;
+            switch (filtroSocio)
             {
-                CNPJValido = listaCNPJValido.FirstOrDefault(x => x.Qsa != null && x.Qsa.Count == 1);
-                if (CNPJValido == null)
-                {
-                    return Results.Ok("Nenhuma empresa com único sócio encontrada.");
-                }
+                case FiltroSocio.Aleatorio:
+                    CNPJEncontrado = listaCNPJValido.FirstOrDefault();
+                    break;
+                case FiltroSocio.VariosSocios:
+                    CNPJEncontrado = listaCNPJValido.FirstOrDefault(x => x.Qsa.Count > 1);
+                    break;
+                case FiltroSocio.UnicoSocio:
+                    CNPJEncontrado = listaCNPJValido.FirstOrDefault(x => x.Qsa != null && x.Qsa.Count == 1);
+                    break;
+
             }
 
-            var removeIndex = listaCNPJValido.IndexOf(CNPJValido);
+            if (CNPJEncontrado == null)
+            {
+                return Results.Ok("Nenhuma empresa disponível para esse filtro.");
+            }
+
+            var removeIndex = listaCNPJValido.IndexOf(CNPJEncontrado);
             if (removeIndex != -1)
             {
                 redisService.ItemRemove<ReceitaWSResponse>("cnpjs", removeIndex);
             }
 
-            return Results.Ok(CNPJValido);
+            return Results.Ok(CNPJEncontrado);
         }).WithTags("Geradores");
 
         app.MapGet("/", ([FromServices] ApiCicloDeVidaService apiCicloDeVida, [FromServices] ConfigReceitaWSService configReceitaWSService, [FromServices] IRedisService redisService) =>
-        {
-            var ultimoDeploy = "Último deploy " + apiCicloDeVida.iniciouEm.ToString("dd/MM/yyyy HH:mm:ss");
-            var upTime = DateTime.Now.Subtract(apiCicloDeVida.iniciouEm).ToString("c");
-            var ambiente = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
-            int cnpjsRegistrados = 0;
-            if (listaCNPJValido != null)
             {
-                cnpjsRegistrados = redisService.Get<List<ReceitaWSResponse>>("cnpjs").ToList().Count;
-            }
-            return Results.Ok(new HealthCheckResponse()
-            {
-                UltimoDeploy = ultimoDeploy,
-                UpTime = upTime,
-                WorkerAtivo = configReceitaWSService.WorkerAtivo,
-                CnpjsRegistrados = cnpjsRegistrados,
-                Ambiente = ambiente
+                var ultimoDeploy = "Último deploy " + apiCicloDeVida.iniciouEm.ToString("dd/MM/yyyy HH:mm:ss");
+                var upTime = DateTime.Now.Subtract(apiCicloDeVida.iniciouEm).ToString("c");
+                var ambiente = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
+                int cnpjsRegistrados = 0;
+                if (listaCNPJValido != null)
+                {
+                    cnpjsRegistrados = redisService.Get<List<ReceitaWSResponse>>("cnpjs").ToList().Count;
+                }
+                return Results.Ok(new HealthCheckResponse()
+                {
+                    UltimoDeploy = ultimoDeploy,
+                    UpTime = upTime,
+                    WorkerAtivo = configReceitaWSService.WorkerAtivo,
+                    CnpjsRegistrados = cnpjsRegistrados,
+                    Ambiente = ambiente
 
-            });
-        }).WithTags("Health Check");
+                });
+            }).WithTags("Health Check");
 
         app.MapPost("/ReceitaWSBackgroundWorker", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromBody] ConfigReceitaWSRequest request, [FromServices] ConfigReceitaWSService configReceitaWSService, [FromServices] IRedisService redisService) =>
         {
@@ -180,5 +191,22 @@ internal class Program
         }
 
         app.Run();
+    }
+}
+
+internal sealed class EnumSchemaFilter : ISchemaFilter
+{
+    public void Apply(OpenApiSchema model, SchemaFilterContext context)
+    {
+        if (context.Type.IsEnum)
+        {
+            model.Enum.Clear();
+            Enum
+               .GetNames(context.Type)
+               .ToList()
+               .ForEach(name => model.Enum.Add(new OpenApiString($"{name}")));
+            model.Type = "string";
+            model.Format = string.Empty;
+        }
     }
 }
