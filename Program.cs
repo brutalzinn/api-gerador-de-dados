@@ -28,7 +28,7 @@ internal class Program
         var info = new OpenApiInfo()
         {
             Version = "v1",
-            Title = "Gerador de CNPJ validado pela receitaWS",
+            Title = "Gerador de documentos (CNPJ)",
             Description = "Minimal API para gerar lista de cnpj validados pela receitaWS",
             Contact = contact
         };
