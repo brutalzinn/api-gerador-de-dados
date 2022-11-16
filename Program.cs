@@ -1,3 +1,5 @@
+using Bogus;
+using Bogus.Extensions.Brazil;
 using GeradorDeDados;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
@@ -6,6 +8,8 @@ using GeradorDeDados.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using StringPlaceholder;
+using System.Text.Json;
 
 internal class Program
 {
@@ -46,7 +50,6 @@ internal class Program
                 case FiltroSocio.UnicoSocio:
                     CNPJEncontrado = listaCNPJValido.FirstOrDefault(x => x.Qsa != null && x.Qsa.Count == 1);
                     break;
-
             }
 
             if (CNPJEncontrado == null)
@@ -61,7 +64,13 @@ internal class Program
             }
 
             return Results.Ok(CNPJEncontrado);
-        }).WithTags("Geradores");
+        }).WithTags("Geradores")
+        .WithOpenApi(options =>
+         {
+             options.Summary = "Obtém um CNPJ aleatório ou filtrado e validado pela ReceitaWS";
+             options.Description = "Obtém um CNPJ aleatório ou filtrado e validado pela ReceitaWS. Cada CNPJ gerado é excluído do cache. Certifique-se que há empresas cadastradas disponíveis.";
+             return options;
+         });
 
         app.MapGet("/", ([FromServices] ApiCicloDeVidaService apiCicloDeVida, [FromServices] ConfigReceitaWSService configReceitaWSService, [FromServices] IRedisService redisService) =>
             {
@@ -83,14 +92,60 @@ internal class Program
                     Ambiente = ambiente
 
                 });
-            }).WithTags("Health Check");
+            }).WithTags("Health Check")
+              .WithOpenApi(options =>
+              {
+                  options.Summary = "Obtém informações da API";
+                  options.Description = "Exibe informações sobre deploy, status do BackgroundWorker de consulta e exibe número de empresas cadastradas";
+                  return options;
+              });
 
         app.MapPost("/ReceitaWSBackgroundWorker", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromBody] ConfigReceitaWSRequest request, [FromServices] ConfigReceitaWSService configReceitaWSService, [FromServices] IRedisService redisService) =>
         {
             configReceitaWSService.WorkerAtivo = request.WorkerAtivo;
             return Results.Ok();
-        }).WithTags("ReceitaWS");
+        }).WithTags("Background Workers")
+          .WithOpenApi(options =>
+           {
+               options.Summary = "Controla a tarefa de consulta em background";
+               options.Description = "Use WorkerAtivo para Ligar/Desligar o BackgroundWorker de consulta ReceitaWS.";
+               return options;
+           });
 
+
+        app.MapPost("/placeholder", ([FromBody] JsonElement data) =>
+        {
+            var stringPlaceholder = new PlaceholderCreator();
+            var _faker = new Faker("pt_BR");
+            var listaExecutors = new List<StringExecutor>()
+            {
+                new StringExecutor("CPF", ()=> _faker.Person.Cpf(false)),
+                new StringExecutor("CNPJ",()=> _faker.Company.Cnpj(false)),
+                new StringExecutor("COMPANYNAME",()=> _faker.Company.CompanyName())
+            };
+            var dictionary = new Dictionary<string, string>();
+
+            if (data.ValueKind == JsonValueKind.Object)
+            {
+                var enumerate = data.EnumerateObject();
+                foreach (JsonProperty p in enumerate)
+                {
+                    if (p.Value.ValueKind == JsonValueKind.String)
+                    {
+                        dictionary.Add(p.Name, p.Value.GetString());
+                    }
+                }
+            }
+            var dictionaryToJson = JsonSerializer.Serialize(dictionary);
+            var result = stringPlaceholder.Creator(dictionaryToJson, listaExecutors);
+            return Results.Text(result, contentType: "application/json");
+        }).WithTags("Fake Json")
+        .WithOpenApi(options =>
+         {
+             options.Summary = "Substitui um placeholder por um dado aleatório ( EM TESTE )";
+             options.Description = "Rota em teste. Você pode inserir um CPF/CNPJ aleatório no texto utilizando os placeholders [CPF] ou [CNPJ]";
+             return options;
+         });
 
 
         app.Run();

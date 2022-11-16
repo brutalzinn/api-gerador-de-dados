@@ -95,7 +95,7 @@ namespace GeradorDeDados
                 c.SwaggerDoc("v1", info);
                 c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
                 {
-                    Description = "ApiKey must appear in header",
+                    Description = "Insira a ApiKey abaixo.",
                     Type = SecuritySchemeType.ApiKey,
                     Name = "ApiKey",
                     In = ParameterLocation.Header,
@@ -131,6 +131,7 @@ namespace GeradorDeDados
                     model.Type = "string";
                     model.Format = string.Empty;
                 }
+
             }
         }
     }
