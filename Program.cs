@@ -124,6 +124,7 @@ internal class Program
                 new StringExecutor("COMPANYNAME",()=> _faker.Company.CompanyName())
             };
             var dictionary = new Dictionary<string, string>();
+            var resultado = "";
 
             if (data.ValueKind == JsonValueKind.Object)
             {
@@ -135,9 +136,13 @@ internal class Program
                         dictionary.Add(p.Name, p.Value.GetString());
                     }
                 }
+                resultado = JsonSerializer.Serialize(dictionary);
             }
-            var dictionaryToJson = JsonSerializer.Serialize(dictionary);
-            var result = stringPlaceholder.Creator(dictionaryToJson, listaExecutors);
+            else
+            {
+                resultado = JsonSerializer.Serialize(data);
+            }
+            var result = stringPlaceholder.Creator(resultado, listaExecutors);
             return Results.Text(result, contentType: "application/json");
         }).WithTags("Fake Json")
         .WithOpenApi(options =>
