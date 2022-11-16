@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="RestEase" Version="1.6.0" />
     <PackageReference Include="RestEase.HttpClientFactory" Version="1.6.0" />
-    <PackageReference Include="StringPlaceholder" Version="1.0.0" />
+    <PackageReference Include="StringPlaceholder" Version="1.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
