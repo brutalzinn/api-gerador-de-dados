@@ -1,17 +1,11 @@
-using ConfigurationSubstitution;
 using GeradorDeDados;
-using GeradorDeDados.Authentication;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
 using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using RestEase.HttpClientFactory;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Microsoft.Extensions.Options;
 
 internal class Program
 {
@@ -19,94 +13,13 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        var contact = new OpenApiContact()
-        {
-            Name = "Roberto Paes",
-            Email = "contato@robertinho.net",
-            Url = new Uri("http://robertocpaes.dev")
-        };
-
-
-        var info = new OpenApiInfo()
-        {
-            Version = "v1",
-            Title = "Gerador de documentos (CNPJ)",
-            Description = "Minimal API para gerar lista de cnpj validados pela receitaWS",
-            Contact = contact
-        };
-
-
-        var config = new ConfigurationBuilder()
-                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: true)
-                    .AddEnvironmentVariables()
-                    .EnableSubstitutions("%", "%")
-                    .Build();
-
-
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(c =>
-        {
-            c.SchemaFilter<EnumSchemaFilter>();
-            c.SwaggerDoc("v1", info);
-            c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
-            {
-                Description = "ApiKey must appear in header",
-                Type = SecuritySchemeType.ApiKey,
-                Name = "ApiKey",
-                In = ParameterLocation.Header,
-                Scheme = "ApiKeyScheme"
-            });
-            var key = new OpenApiSecurityScheme()
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "ApiKey"
-                },
-                In = ParameterLocation.Header
-            };
-            var requirement = new OpenApiSecurityRequirement
-                    {
-                             { key, new List<string>() }
-                    };
-            c.AddSecurityRequirement(requirement);
-
-        });
-
-
-
-
-
-
-        builder.Services.AddSingleton<IRedisService, RedisService>();
-        builder.Services.AddHostedService<CNPJBackgroundWorker>();
-        builder.Services.AddRestEaseClient<IReceitaWS>("https://receitaws.com.br");
-        builder.Services.AddSingleton<ApiCicloDeVidaService>();
-        builder.Services.AddSingleton<ConfigReceitaWSService>();
-        builder.Services.Configure<ApiConfig>(options => config.GetSection("ApiConfig").Bind(options));
-
-        builder.Services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = ObterRedisContext();
-        });
-
-
-        builder.Services.AddAuthentication("ApiKey")
-            .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>
-            ("ApiKey", null);
-
-        builder.Services.AddAuthorization();
-
-
+        DependencyInjection.CriarInjecao(builder.Services);
         var app = builder.Build();
-
-
+        var apiConfig = app.Services.GetService<IOptions<ApiConfig>>().Value;
         app.UseAuthentication();
         app.UseAuthorization();
         // Configure the HTTP request pipeline.
-        if (config.GetSection("ApiConfig").Get<ApiConfig>().Swagger)
+        if (apiConfig.Swagger)
         {
             app.UseSwagger();
             app.UseSwaggerUI();
@@ -178,35 +91,9 @@ internal class Program
             return Results.Ok();
         }).WithTags("ReceitaWS");
 
-        string ObterRedisContext()
-        {
-            var redisContextUrl = config.GetConnectionString("Redis");
-            Uri redisUrl;
-            bool isRedisUrl = Uri.TryCreate(redisContextUrl, UriKind.Absolute, out redisUrl);
-            if (isRedisUrl)
-            {
-                redisContextUrl = string.Format("{0}:{1},password={2}", redisUrl.Host, redisUrl.Port, redisUrl.UserInfo.Split(':')[1]);
-            }
-            return redisContextUrl;
-        }
+
 
         app.Run();
     }
 }
 
-internal sealed class EnumSchemaFilter : ISchemaFilter
-{
-    public void Apply(OpenApiSchema model, SchemaFilterContext context)
-    {
-        if (context.Type.IsEnum)
-        {
-            model.Enum.Clear();
-            Enum
-               .GetNames(context.Type)
-               .ToList()
-               .ForEach(name => model.Enum.Add(new OpenApiString($"{name}")));
-            model.Type = "string";
-            model.Format = string.Empty;
-        }
-    }
-}
