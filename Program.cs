@@ -31,9 +31,26 @@ internal class Program
 
         //app.UseHttpsRedirection();
 
-        app.MapGet("/obterCNPJValido/{filtroSocio}", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromRoute] FiltroSocio filtroSocio, [FromServices] IRedisService redisService) =>
+        app.MapGet("/obterCNPJValido/{filtroSocio}/{filtroSituacao}/{normalizado}",
+            [Authorize(AuthenticationSchemes = "ApiKey")]
+        (
+        [FromServices] IRedisService redisService,
+        [FromRoute] FiltroSocio filtroSocio,
+        [FromRoute] Situacao filtroSituacao,
+        [FromRoute] bool normalizado) =>
         {
             var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
+
+
+            switch (filtroSituacao)
+            {
+                case Situacao.Ativa:
+                    listaCNPJValido = listaCNPJValido.Where(x => x.Situacao.Equals("ATIVA")).ToList();
+                    break;
+                case Situacao.Baixada:
+                    listaCNPJValido = listaCNPJValido.Where(x => x.Situacao.Equals("BAIXADA")).ToList();
+                    break;
+            }
             if (listaCNPJValido == null)
             {
                 return Results.Ok("Nenhuma empresa disponível.");
@@ -62,7 +79,10 @@ internal class Program
             {
                 redisService.ItemRemove<ReceitaWSResponse>("cnpjs", removeIndex);
             }
-
+            if (normalizado)
+            {
+                return Results.Ok(CNPJEncontrado.ObterResponseSalinizado());
+            }
             return Results.Ok(CNPJEncontrado);
         }).WithTags("Geradores")
         .WithOpenApi(options =>
@@ -117,6 +137,7 @@ internal class Program
         {
             var stringPlaceholder = new PlaceholderCreator();
             var _faker = new Faker("pt_BR");
+
             var listaExecutors = new List<StringExecutor>()
             {
                 new StringExecutor("CPF", ()=> _faker.Person.Cpf(false)),

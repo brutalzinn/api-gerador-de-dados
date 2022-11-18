@@ -6,4 +6,10 @@
         UnicoSocio,
         VariosSocios
     }
+    public enum Situacao
+    {
+        Aleatorio = 0,
+        Ativa,
+        Baixada
+    }
 }

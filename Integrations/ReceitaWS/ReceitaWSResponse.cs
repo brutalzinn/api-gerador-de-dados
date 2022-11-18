@@ -2,51 +2,6 @@
 
 namespace GeradorDeDados.Integrations.ReceitaWS
 {
-    public class AtividadePrincipal
-    {
-        [JsonProperty("code")]
-        public string Code { get; set; }
-
-        [JsonProperty("text")]
-        public string Text { get; set; }
-    }
-
-    public class AtividadesSecundaria
-    {
-        [JsonProperty("code")]
-        public string Code { get; set; }
-
-        [JsonProperty("text")]
-        public string Text { get; set; }
-    }
-
-    public class Billing
-    {
-        [JsonProperty("free")]
-        public bool Free { get; set; }
-
-        [JsonProperty("database")]
-        public bool Database { get; set; }
-    }
-
-    public class Qsa
-    {
-        [JsonProperty("nome")]
-        public string Nome { get; set; }
-
-        [JsonProperty("qual")]
-        public string Qual { get; set; }
-
-        [JsonProperty("pais_origem")]
-        public string PaisOrigem { get; set; }
-
-        [JsonProperty("nome_rep_legal")]
-        public string NomeRepLegal { get; set; }
-
-        [JsonProperty("qual_rep_legal")]
-        public string QualRepLegal { get; set; }
-    }
-
     public class ReceitaWSResponse
     {
         [JsonProperty("status")]
@@ -135,7 +90,98 @@ namespace GeradorDeDados.Integrations.ReceitaWS
 
         [JsonProperty("billing")]
         public Billing Billing { get; set; }
+
+        public ReceitaWSResponse ObterResponseSalinizado()
+        {
+            return new ReceitaWSResponse()
+            {
+                Abertura = Abertura.Salinizar(),
+                Situacao = Situacao.Salinizar(),
+                SituacaoEspecial = SituacaoEspecial.Salinizar(),
+                Efr = Efr.Salinizar(),
+                Cnpj = Cnpj.ObterSomenteNumeros(),
+                NaturezaJuridica = NaturezaJuridica.ObterSomenteNumeros(),
+                Tipo = Tipo.Salinizar(),
+                Cep = Cep.ObterSomenteNumeros(),
+                MotivoSituacao = string.IsNullOrEmpty(MotivoSituacao) ? "" : MotivoSituacao.Split(" ")[0],
+                Status = Status.Salinizar(),
+                Porte = Porte.Salinizar(),
+                Fantasia = Fantasia.Salinizar(),
+                Logradouro = Logradouro.Salinizar(),
+                Numero = Numero.Salinizar(),
+                Complemento = Complemento.Salinizar(),
+                Bairro = Bairro.Salinizar(),
+                Municipio = Municipio.Salinizar(),
+                Uf = Uf.Salinizar(),
+                Email = Email,
+                Telefone = Telefone.Replace(" ", ""),
+                DataSituacao = DataSituacao,
+                DataSituacaoEspecial = DataSituacaoEspecial,
+                CapitalSocial = CapitalSocial,
+                Qsa = Qsa,
+                Billing = Billing,
+                Nome = Nome,
+                AtividadePrincipal = AtividadePrincipal.Select(x =>
+                {
+                    x.Code = x.Code.ObterSomenteNumeros();
+                    x.Text = x.Text.Salinizar();
+                    return x;
+                }).ToList(),
+                AtividadesSecundarias = AtividadesSecundarias.Select(x =>
+                {
+                    x.Code = x.Code.ObterSomenteNumeros();
+                    x.Text = x.Text.Salinizar();
+                    return x;
+                }).ToList(),
+
+
+            };
+        }
+
     }
 
+    public class AtividadePrincipal
+    {
+        [JsonProperty("code")]
+        public string Code { get; set; }
 
+        [JsonProperty("text")]
+        public string Text { get; set; }
+    }
+
+    public class AtividadesSecundaria
+    {
+        [JsonProperty("code")]
+        public string Code { get; set; }
+
+        [JsonProperty("text")]
+        public string Text { get; set; }
+    }
+
+    public class Billing
+    {
+        [JsonProperty("free")]
+        public bool Free { get; set; }
+
+        [JsonProperty("database")]
+        public bool Database { get; set; }
+    }
+
+    public class Qsa
+    {
+        [JsonProperty("nome")]
+        public string Nome { get; set; }
+
+        [JsonProperty("qual")]
+        public string Qual { get; set; }
+
+        [JsonProperty("pais_origem")]
+        public string PaisOrigem { get; set; }
+
+        [JsonProperty("nome_rep_legal")]
+        public string NomeRepLegal { get; set; }
+
+        [JsonProperty("qual_rep_legal")]
+        public string QualRepLegal { get; set; }
+    }
 }
