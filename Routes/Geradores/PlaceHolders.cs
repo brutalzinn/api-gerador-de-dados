@@ -22,10 +22,10 @@ namespace GeradorDeDados.Routes.Geradores
             var placeholders = new List<StringExecutor>()
             {
                 new StringExecutor("GUID", ()=> Guid.NewGuid().ToString(), "Cria um UUID padrão"),
-                new StringExecutor("CPF", ()=> _faker.Person.Cpf(false)),
-                new StringExecutor("CNPJ",()=> _faker.Company.Cnpj(false)),
-                new StringExecutor("COMPANYNAME",()=> _faker.Company.CompanyName()),
-                new StringExecutor("BASE64", GetImageAsBase64Url, "Gera uma imagem em base64 dado uma url. Aceita url de imagem como parâmetro",
+                new StringExecutor("CPF", ()=> _faker.Person.Cpf(false), "Cria um CPF"),
+                new StringExecutor("CNPJ",()=> _faker.Company.Cnpj(false), "Cria um CNPJ"),
+                new StringExecutor("COMPANYNAME",()=> _faker.Company.CompanyName(), "Cria um nome de empresa aleatório."),
+                new StringExecutor("BASE64", GetImageAsBase64Url, "Cria um base64 dado uma url de imagem como parâmetro.",
                 new List<string>()
                 {
                 "imageUrl"
