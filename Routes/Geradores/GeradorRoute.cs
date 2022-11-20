@@ -119,7 +119,7 @@ namespace GeradorDeDados.Routes.Geradores
                    $"Descrição: {descricao}<br/>";
            }
 
-           options.Summary = "Substitui um placeholder por um dado aleatório ( EM TESTE )";
+           options.Summary = "Permite criar um json ou um string com o uso de placeholders e gerar dados aleatórios.";
            options.Description = $"{descricaoPlaceholders}";
            return options;
        });
