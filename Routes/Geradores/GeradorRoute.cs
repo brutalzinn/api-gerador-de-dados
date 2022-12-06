@@ -3,6 +3,7 @@ using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestEase.Implementation;
 using StringPlaceholder;
 using System.Text.Json;
 
@@ -72,57 +73,42 @@ namespace GeradorDeDados.Routes.Geradores
           options.Description = "Obtém um CNPJ aleatório ou filtrado e validado pela ReceitaWS. Cada CNPJ gerado é excluído do cache. Certifique-se que há empresas cadastradas disponíveis.";
           return options;
       });
-
-            app.MapPost("/placeholder", ([FromBody] JsonElement data) =>
+            app.MapPost("/placeholder", async (HttpRequest httpContext) =>
             {
+                var data = "";
+                using (StreamReader stream = new StreamReader(httpContext.Body))
+                {
+                    data = await stream.ReadToEndAsync();
+                }
                 var stringPlaceholder = new PlaceholderCreator();
-
-
-                var dictionary = new Dictionary<string, string>();
                 var resultado = "";
-
-                if (data.ValueKind == JsonValueKind.Object)
-                {
-                    var enumerate = data.EnumerateObject();
-                    foreach (JsonProperty p in enumerate)
-                    {
-                        if (p.Value.ValueKind == JsonValueKind.String)
-                        {
-                            dictionary.Add(p.Name, p.Value.GetString());
-                        }
-                    }
-                    resultado = JsonSerializer.Serialize(dictionary);
-                }
-                else
-                {
-                    resultado = JsonSerializer.Serialize(data);
-                }
                 var placeHolders = PlaceHolders.ObterPlaceholders();
-                var result = stringPlaceholder.Creator(resultado, placeHolders);
+                var result = stringPlaceholder.Creator(data, placeHolders);
                 return Results.Text(result, contentType: "application/json");
             }).WithTags("Geradores")
-       .WithOpenApi(options =>
-       {
-           var placeHolders = PlaceHolders.ObterPlaceholders();
-           var descricaoPlaceholders = "Placeholders disponíveis:<br/>";
-           foreach (var placeholder in placeHolders)
-           {
-               var aceitaParametros = placeholder.EnabledMultipleParams;
-               var chave = placeholder.Key;
-               var descricao = placeholder.Description;
-               var args = placeholder.Args;
-               var usoDescricao = args != null && args.Count() > 0 ? $"[{chave}({string.Join(",", args)})]" : $"[{chave}]";
-               descricaoPlaceholders += $"[{chave}] " +
-                   "<br/>" +
-                   $"Uso: {usoDescricao}" +
-                   "<br/>" +
-                   $"Descrição: {descricao}<br/>";
-           }
+                 .WithOpenApi(options =>
+                 {
+                     var placeHolders = PlaceHolders.ObterPlaceholders();
+                     var descricaoPlaceholders = "Placeholders disponíveis:<br/>";
+                     foreach (var placeholder in placeHolders)
+                     {
+                         var aceitaParametros = placeholder.EnabledMultipleParams;
+                         var chave = placeholder.Key;
+                         var descricao = placeholder.Description;
+                         var args = placeholder.Args;
+                         var usoDescricao = args != null && args.Count() > 0 ? $"[{chave}({string.Join(",", args)})]" : $"[{chave}]";
+                         descricaoPlaceholders += $"[{chave}] " +
+                             "<br/>" +
+                             $"Uso: {usoDescricao}" +
+                             "<br/>" +
+                             $"Descrição: {descricao}<br/>";
+                     }
 
-           options.Summary = "Permite criar um json ou um string com o uso de placeholders e gerar dados aleatórios.";
-           options.Description = $"{descricaoPlaceholders}";
-           return options;
-       });
+                     options.Summary = "Permite criar um json ou um string com o uso de placeholders e gerar dados aleatórios.";
+                     options.Description = $"{descricaoPlaceholders}";
+                     return options;
+                 });
+
 
 
         }
