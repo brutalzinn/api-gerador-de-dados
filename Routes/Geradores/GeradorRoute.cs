@@ -73,7 +73,9 @@ namespace GeradorDeDados.Routes.Geradores
           options.Description = "Obtém um CNPJ aleatório ou filtrado e validado pela ReceitaWS. Cada CNPJ gerado é excluído do cache. Certifique-se que há empresas cadastradas disponíveis.";
           return options;
       });
-            app.MapPost("/placeholder", async (HttpRequest httpContext) =>
+            app.MapPost("/placeholder",
+                [Authorize(AuthenticationSchemes = "ApiKey")]
+            async (HttpRequest httpContext) =>
             {
                 var data = "";
                 using (StreamReader stream = new StreamReader(httpContext.Body))
@@ -103,7 +105,6 @@ namespace GeradorDeDados.Routes.Geradores
                              "<br/>" +
                              $"Descrição: {descricao}<br/>";
                      }
-
                      options.Summary = "Permite criar um json ou um string com o uso de placeholders e gerar dados aleatórios.";
                      options.Description = $"{descricaoPlaceholders}";
                      return options;
