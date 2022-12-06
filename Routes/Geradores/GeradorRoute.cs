@@ -97,7 +97,7 @@ namespace GeradorDeDados.Routes.Geradores
                          var descricao = placeholder.Description;
                          var args = placeholder.Args;
                          var usoDescricao = args != null && args.Count() > 0 ? $"[{chave}({string.Join(",", args)})]" : $"[{chave}]";
-                         descricaoPlaceholders += $"[{chave}] " +
+                         descricaoPlaceholders += $"{chave}" +
                              "<br/>" +
                              $"Uso: {usoDescricao}" +
                              "<br/>" +
