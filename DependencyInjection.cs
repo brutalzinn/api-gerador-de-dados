@@ -79,7 +79,7 @@ namespace GeradorDeDados
             {
                 Name = "Roberto Paes",
                 Email = "contato@robertinho.net",
-                Url = new Uri("http://robertocpaes.dev")
+                Url = new Uri("https://robertocpaes.dev")
             };
             var info = new OpenApiInfo()
             {
