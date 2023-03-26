@@ -17,8 +17,8 @@
         {
             var response = new CustomExceptionResponse()
             {
-                Type = GetType(),
-                Message = Message
+                Tipo = GetType(),
+                Mensagem = Message
             };
 
             return response;
