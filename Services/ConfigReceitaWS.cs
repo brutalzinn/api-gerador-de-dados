@@ -1,6 +1,6 @@
 ﻿namespace GeradorDeDados.Services
 {
-    public class ConfigReceitaWSService
+    public class ConfigReceitaWS
     {
         public bool WorkerAtivo { get; set; }
     }

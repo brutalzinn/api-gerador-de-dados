@@ -3,7 +3,9 @@ using GeradorDeDados.Authentication;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Services;
+using GeradorDeDados.Works;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using RestEase.HttpClientFactory;
@@ -30,22 +32,23 @@ namespace GeradorDeDados
             services.InjetarServicosDeArmazenamento(config);
             services.InjetarServicos();
             services.InjetarSwagger();
-            services.InjetarPoliticaCors();
+            services.InjetarPoliticaCors(config);
         }
         private static void InjetarServicos(this IServiceCollection services)
         {
             services.AddAuthorization();
             services.AddSingleton<IRedisService, RedisService>();
-            services.AddHostedService<CNPJBackgroundWorker>();
+            services.AddSingleton<DadosReceitaWS>();
+            services.AddHostedService<ReceitaWSWorker>();
             services.AddRestEaseClient<IReceitaWS>("https://receitaws.com.br");
-            services.AddSingleton<ApiCicloDeVidaService>();
-            services.AddSingleton<ConfigReceitaWSService>();
+            services.AddSingleton<ApiCicloDeVida>();
+            services.AddSingleton<ConfigReceitaWS>();
         }
         private static void InjetarAutenticacoes(this IServiceCollection services)
         {
             services.AddAuthentication("ApiKey")
-     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>
-     ("ApiKey", null);
+                 .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>
+                 ("ApiKey", null);
 
         }
         private static void InjetarServicosDeArmazenamento(this IServiceCollection services, IConfigurationRoot config)
@@ -72,11 +75,13 @@ namespace GeradorDeDados
             services.Configure<ApiConfig>(options => config.GetSection("ApiConfig").Bind(options));
         }
 
-        private static void InjetarPoliticaCors(this IServiceCollection services)
+        private static void InjetarPoliticaCors(this IServiceCollection services, IConfigurationRoot config)
         {
+            var serviceProvider = services.BuildServiceProvider();
+            var apiConfig = serviceProvider.GetRequiredService<IOptions<ApiConfig>>().Value;
             services.AddCors(p => p.AddPolicy("corsapp", builder =>
             {
-                builder.WithOrigins("https://gerador-cpfcnpj-angular.vercel.app").AllowAnyMethod().AllowAnyHeader();
+                builder.WithOrigins(apiConfig.CorsOrigin).AllowAnyMethod().AllowAnyHeader();
             }));
         }
 

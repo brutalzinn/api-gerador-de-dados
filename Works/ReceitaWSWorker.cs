@@ -4,18 +4,18 @@ using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Services;
 using System.Text.Json;
 
-namespace GeradorDeDados
+namespace GeradorDeDados.Works
 {
-    public class CNPJBackgroundWorker : BackgroundService
+    public class ReceitaWSWorker : BackgroundService
     {
-        readonly ILogger<CNPJBackgroundWorker> _logger;
+        readonly ILogger<ReceitaWSWorker> _logger;
         readonly IReceitaWS _receitaWS;
         readonly IRedisService _redisService;
-        readonly ConfigReceitaWSService _configReceitaWSService;
+        readonly ConfigReceitaWS _configReceitaWSService;
         readonly Faker _faker;
 
-        public CNPJBackgroundWorker(ILogger<CNPJBackgroundWorker> logger, IReceitaWS receitaWS,
-            ConfigReceitaWSService configReceitaWSService,
+        public ReceitaWSWorker(ILogger<ReceitaWSWorker> logger, IReceitaWS receitaWS,
+            ConfigReceitaWS configReceitaWSService,
             IRedisService redisService)
         {
             _logger = logger;

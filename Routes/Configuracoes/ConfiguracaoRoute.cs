@@ -11,7 +11,7 @@ namespace GeradorDeDados.Routes.Configuracoes
     {
         public static void CriarRota(this WebApplication app)
         {
-            app.MapPost("/ReceitaWSBackgroundWorker", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromBody] ConfigReceitaWSRequest request, [FromServices] ConfigReceitaWSService configReceitaWSService, [FromServices] IRedisService redisService) =>
+            app.MapPost("/ReceitaWSBackgroundWorker", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromBody] ConfigReceitaWSRequest request, [FromServices] ConfigReceitaWS configReceitaWSService, [FromServices] IRedisService redisService) =>
         {
             configReceitaWSService.WorkerAtivo = request.WorkerAtivo;
             return Results.Ok();
@@ -23,7 +23,7 @@ namespace GeradorDeDados.Routes.Configuracoes
                return options;
            });
 
-            app.MapGet("/", ([FromServices] ApiCicloDeVidaService apiCicloDeVida, [FromServices] ConfigReceitaWSService configReceitaWSService, [FromServices] IRedisService redisService) =>
+            app.MapGet("/", ([FromServices] ApiCicloDeVida apiCicloDeVida, [FromServices] ConfigReceitaWS configReceitaWSService, [FromServices] IRedisService redisService) =>
             {
                 var ultimoDeploy = "Último deploy " + apiCicloDeVida.iniciouEm.ToString("dd/MM/yyyy HH:mm:ss");
                 var upTime = DateTime.Now.Subtract(apiCicloDeVida.iniciouEm).ToString("c");

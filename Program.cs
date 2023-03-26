@@ -1,4 +1,5 @@
 using GeradorDeDados;
+using GeradorDeDados.Handlers;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
 using GeradorDeDados.Models.Settings;
@@ -14,24 +15,21 @@ internal class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
         DependencyInjection.CriarInjecao(builder.Services);
         var app = builder.Build();
-        var apiConfig = app.Services.GetService<IOptions<ApiConfig>>().Value;
+        var apiConfig = app.Services.GetRequiredService<IOptions<ApiConfig>>().Value;
         app.UseAuthentication();
         app.UseAuthorization();
-
-        // Configure the HTTP request pipeline.
+        app.AddCustomExceptionHandler();
         if (apiConfig.Swagger)
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
         app.UseCors("corsapp");
         ConfiguracaoRoute.CriarRota(app);
         GeradorRoute.CriarRota(app);
-
+        PlaceholderRoute.CriarRota(app);
         app.Run();
     }
 }

@@ -6,10 +6,18 @@
         UnicoSocio,
         VariosSocios
     }
-    public enum Situacao
+    public enum FiltroSituacao
     {
         Aleatorio = 0,
         Ativa,
         Baixada
+    }
+    public enum TipoExcecao
+    {
+        VALIDACAO = 400,
+        NEGOCIO = 406,
+        NOTFOUND = 404,
+        AUTORIZACAO = 401,
+        INTERNO = 500
     }
 }

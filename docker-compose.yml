@@ -9,7 +9,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
-      - "5555:80"
+      - "5556:80"
     links:
     - "redis_service"
     depends_on:

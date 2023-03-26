@@ -1,6 +1,8 @@
 ﻿using Bogus;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
+using GeradorDeDados.Placeholder;
+using GeradorDeDados.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestEase.Implementation;
@@ -16,102 +18,20 @@ namespace GeradorDeDados.Routes.Geradores
             app.MapGet("/obterCNPJValido/{filtroSocio}/{filtroSituacao}/{normalizado}",
           [Authorize(AuthenticationSchemes = "ApiKey")]
             (
-      [FromServices] IRedisService redisService,
-      [FromRoute] FiltroSocio filtroSocio,
-      [FromRoute] Situacao filtroSituacao,
-      [FromRoute] bool normalizado) =>
+              [FromServices] DadosReceitaWS dadosReceitaWS,
+              [FromRoute] FiltroSocio filtroSocio,
+              [FromRoute] FiltroSituacao filtroSituacao,
+              [FromRoute] bool normalizado) =>
           {
-              var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
-
-
-              switch (filtroSituacao)
-              {
-                  case Situacao.Ativa:
-                      listaCNPJValido = listaCNPJValido.Where(x => x.Situacao.Equals("ATIVA")).ToList();
-                      break;
-                  case Situacao.Baixada:
-                      listaCNPJValido = listaCNPJValido.Where(x => x.Situacao.Equals("BAIXADA")).ToList();
-                      break;
-              }
-              if (listaCNPJValido == null)
-              {
-                  return Results.Ok("Nenhuma empresa disponível.");
-              }
-              ReceitaWSResponse CNPJEncontrado = null;
-              switch (filtroSocio)
-              {
-                  case FiltroSocio.Aleatorio:
-                      CNPJEncontrado = listaCNPJValido.FirstOrDefault();
-                      break;
-                  case FiltroSocio.VariosSocios:
-                      CNPJEncontrado = listaCNPJValido.FirstOrDefault(x => x.Qsa.Count > 1);
-                      break;
-                  case FiltroSocio.UnicoSocio:
-                      CNPJEncontrado = listaCNPJValido.FirstOrDefault(x => x.Qsa != null && x.Qsa.Count == 1);
-                      break;
-              }
-
-              if (CNPJEncontrado == null)
-              {
-                  return Results.Ok("Nenhuma empresa disponível para esse filtro.");
-              }
-
-              var removeIndex = listaCNPJValido.IndexOf(CNPJEncontrado);
-              if (removeIndex != -1)
-              {
-                  redisService.ItemRemove<ReceitaWSResponse>("cnpjs", removeIndex);
-              }
-              if (normalizado)
-              {
-                  return Results.Ok(CNPJEncontrado.ObterResponseSalinizado());
-              }
-              return Results.Ok(CNPJEncontrado);
+              var empresaReceitaWS = dadosReceitaWS.ObterDadosEmpresaRegistrada(filtroSocio, filtroSituacao, normalizado);
+              return Results.Ok(empresaReceitaWS);
           }).WithTags("Geradores")
-      .WithOpenApi(options =>
-      {
-          options.Summary = "Obtém um CNPJ aleatório ou filtrado e validado pela ReceitaWS";
-          options.Description = "Obtém um CNPJ aleatório ou filtrado e validado pela ReceitaWS. Cada CNPJ gerado é excluído do cache. Certifique-se que há empresas cadastradas disponíveis.";
-          return options;
-      });
-            app.MapPost("/placeholder",
-                [Authorize(AuthenticationSchemes = "ApiKey")]
-            async (HttpRequest httpContext) =>
-            {
-                var data = "";
-                using (StreamReader stream = new StreamReader(httpContext.Body))
-                {
-                    data = await stream.ReadToEndAsync();
-                }
-                var stringPlaceholder = new PlaceholderCreator();
-                var resultado = "";
-                var placeHolders = PlaceHolders.ObterPlaceholders();
-                var result = stringPlaceholder.Creator(data, placeHolders);
-                return Results.Text(result, contentType: "application/json");
-            }).WithTags("Geradores")
-                 .WithOpenApi(options =>
-                 {
-                     var placeHolders = PlaceHolders.ObterPlaceholders();
-                     var descricaoPlaceholders = "Placeholders disponíveis:<br/>";
-                     foreach (var placeholder in placeHolders)
-                     {
-                         var aceitaParametros = placeholder.EnabledMultipleParams;
-                         var chave = placeholder.Key;
-                         var descricao = placeholder.Description;
-                         var args = placeholder.Args;
-                         var usoDescricao = args != null && args.Count() > 0 ? $"[{chave}({string.Join(",", args)})]" : $"[{chave}]";
-                         descricaoPlaceholders += $"{chave}" +
-                             "<br/>" +
-                             $"Uso: {usoDescricao}" +
-                             "<br/>" +
-                             $"Descrição: {descricao}<br/>";
-                     }
-                     options.Summary = "Permite criar um json ou um string com o uso de placeholders e gerar dados aleatórios.";
-                     options.Description = $"{descricaoPlaceholders}";
-                     return options;
-                 });
-
-
-
+              .WithOpenApi(options =>
+              {
+                  options.Summary = "Obtém um CNPJ aleatório ou filtrado e validado pela ReceitaWS";
+                  options.Description = "Obtém um CNPJ aleatório ou filtrado e validado pela ReceitaWS. Cada CNPJ gerado é excluído do cache. Certifique-se que há empresas cadastradas disponíveis.";
+                  return options;
+              });
         }
     }
 }

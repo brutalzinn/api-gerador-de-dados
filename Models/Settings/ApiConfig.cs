@@ -3,6 +3,7 @@
     public class ApiConfig
     {
         public bool Swagger { get; set; }
+        public string CorsOrigin { get; set; }
         public Authorization Authorization { get; set; }
     }
 

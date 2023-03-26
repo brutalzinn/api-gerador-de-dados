@@ -3,7 +3,7 @@ using Bogus.Extensions;
 using Bogus.Extensions.Brazil;
 using StringPlaceholder;
 
-namespace GeradorDeDados.Routes.Geradores
+namespace GeradorDeDados.Placeholder
 {
     public static class PlaceHolders
     {

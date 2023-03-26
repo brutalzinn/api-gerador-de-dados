@@ -1,10 +1,10 @@
 ﻿namespace GeradorDeDados.Services
 {
-    public class ApiCicloDeVidaService
+    public class ApiCicloDeVida
     {
         public DateTime iniciouEm { get; set; }
 
-        public ApiCicloDeVidaService()
+        public ApiCicloDeVida()
         {
             iniciouEm = DateTime.Now;
         }
