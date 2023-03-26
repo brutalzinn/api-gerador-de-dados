@@ -30,6 +30,7 @@ namespace GeradorDeDados
             services.InjetarServicosDeArmazenamento(config);
             services.InjetarServicos();
             services.InjetarSwagger();
+            services.InjetarPoliticaCors();
         }
         private static void InjetarServicos(this IServiceCollection services)
         {
@@ -69,6 +70,14 @@ namespace GeradorDeDados
         private static void InjetarConfiguracoes(this IServiceCollection services, IConfigurationRoot config)
         {
             services.Configure<ApiConfig>(options => config.GetSection("ApiConfig").Bind(options));
+        }
+
+        private static void InjetarPoliticaCors(this IServiceCollection services)
+        {
+            services.AddCors(p => p.AddPolicy("corsapp", builder =>
+            {
+                builder.WithOrigins("https://gerador-cpfcnpj-angular.vercel.app").AllowAnyMethod().AllowAnyHeader();
+            }));
         }
 
 

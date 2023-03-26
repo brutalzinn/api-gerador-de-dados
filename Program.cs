@@ -20,6 +20,7 @@ internal class Program
         var apiConfig = app.Services.GetService<IOptions<ApiConfig>>().Value;
         app.UseAuthentication();
         app.UseAuthorization();
+
         // Configure the HTTP request pipeline.
         if (apiConfig.Swagger)
         {
@@ -27,7 +28,7 @@ internal class Program
             app.UseSwaggerUI();
         }
 
-        app.UseCors();
+        app.UseCors("corsapp");
         ConfiguracaoRoute.CriarRota(app);
         GeradorRoute.CriarRota(app);
 
