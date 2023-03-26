@@ -18,6 +18,7 @@ internal class Program
         DependencyInjection.CriarInjecao(builder.Services);
         var app = builder.Build();
         var apiConfig = app.Services.GetService<IOptions<ApiConfig>>().Value;
+        app.UseCors();
         app.UseAuthentication();
         app.UseAuthorization();
         // Configure the HTTP request pipeline.
