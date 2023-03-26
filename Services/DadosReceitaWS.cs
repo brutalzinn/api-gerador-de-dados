@@ -10,7 +10,16 @@ namespace GeradorDeDados.Services
         {
             this.redisService = redisService;
         }
-        public ReceitaWSResponse ObterDadosEmpresaRegistrada(FiltroSocio filtroSocio, FiltroSituacao filtroSituacao, bool normalizado)
+        /// <summary>
+        /// Obtem uma empresa da lista de cache do redis.
+        /// </summary>
+        /// <param name="filtroSocio">Tipo do sócio</param>
+        /// <param name="filtroSituacao">Tipo da situação da empresa</param>
+        /// <param name="normalizado">Normalização do dado recebido.</param>
+        /// <param name="excluirCache">Deve excluir o item do cache?</param>
+        /// <returns></returns>
+        /// <exception cref="CustomException"></exception>
+        public ReceitaWSResponse ObterDadosEmpresaRegistrada(FiltroSocio filtroSocio, FiltroSituacao filtroSituacao, bool normalizado, bool excluirEmpresa = false)
         {
             var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
             ReceitaWSResponse CNPJEncontrado = null;
@@ -44,8 +53,11 @@ namespace GeradorDeDados.Services
             {
                 throw new CustomException(TipoExcecao.NEGOCIO, "Não há empresas disponíveis para esse filtro.");
             }
-            var removeIndex = listaCNPJValido.IndexOf(CNPJEncontrado);
-            redisService.ItemRemove<ReceitaWSResponse>("cnpjs", removeIndex); 
+            if (excluirEmpresa)
+            {
+                var removeIndex = listaCNPJValido.IndexOf(CNPJEncontrado);
+                redisService.ItemRemove<ReceitaWSResponse>("cnpjs", removeIndex);
+            }
             if (normalizado)
             {
                 return CNPJEncontrado.ObterResponseSalinizado();

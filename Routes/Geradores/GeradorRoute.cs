@@ -15,15 +15,16 @@ namespace GeradorDeDados.Routes.Geradores
     {
         public static void CriarRota(this WebApplication app)
         {
-            app.MapGet("/obterCNPJValido/{filtroSocio}/{filtroSituacao}/{normalizado}",
+            app.MapGet("/obterCNPJValido/{filtroSocio}/{filtroSituacao}/{normalizado}/{excluirEmpresa}",
           [Authorize(AuthenticationSchemes = "ApiKey")]
             (
               [FromServices] DadosReceitaWS dadosReceitaWS,
               [FromRoute] FiltroSocio filtroSocio,
               [FromRoute] FiltroSituacao filtroSituacao,
-              [FromRoute] bool normalizado) =>
+              [FromRoute] bool normalizado,
+              [FromRoute] bool excluirEmpresa) =>
           {
-              var empresaReceitaWS = dadosReceitaWS.ObterDadosEmpresaRegistrada(filtroSocio, filtroSituacao, normalizado);
+              var empresaReceitaWS = dadosReceitaWS.ObterDadosEmpresaRegistrada(filtroSocio, filtroSituacao, normalizado, excluirEmpresa);
               return Results.Ok(empresaReceitaWS);
           }).WithTags("Geradores")
               .WithOpenApi(options =>
