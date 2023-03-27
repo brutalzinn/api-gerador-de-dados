@@ -19,10 +19,11 @@ namespace GeradorDeDados.Services
         /// <param name="excluirCache">Deve excluir o item do cache?</param>
         /// <returns></returns>
         /// <exception cref="CustomException"></exception>
-        public ReceitaWSResponse ObterDadosEmpresaRegistrada(FiltroSocio filtroSocio, FiltroSituacao filtroSituacao, bool normalizado, bool excluirEmpresa = false)
+        public ReceitaWSResponse ObterDadosEmpresaRegistrada(FiltroSocio filtroSocio, FiltroSituacao filtroSituacao, bool normalizado, bool excluirEmpresa)
         {
             var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
-            ReceitaWSResponse CNPJEncontrado = null;
+            List<ReceitaWSResponse> listaEmpresas = new List<ReceitaWSResponse>();
+            ReceitaWSResponse empresaSelecionada = null;
 
             if (listaCNPJValido == null)
             {
@@ -31,38 +32,36 @@ namespace GeradorDeDados.Services
             switch (filtroSituacao)
             {
                 case FiltroSituacao.Ativa:
-                    listaCNPJValido = listaCNPJValido.Where(x => x.Situacao.Equals("ATIVA")).ToList();
+                    listaEmpresas = listaEmpresas.Where(x => x.Situacao.Equals("ATIVA")).ToList();
                     break;
                 case FiltroSituacao.Baixada:
-                    listaCNPJValido = listaCNPJValido.Where(x => x.Situacao.Equals("BAIXADA")).ToList();
+                    listaEmpresas = listaEmpresas.Where(x => x.Situacao.Equals("BAIXADA")).ToList();
                     break;
             }
             switch (filtroSocio)
             {
-                case FiltroSocio.Aleatorio:
-                    CNPJEncontrado = listaCNPJValido.FirstOrDefault();
-                    break;
                 case FiltroSocio.VariosSocios:
-                    CNPJEncontrado = listaCNPJValido.FirstOrDefault(x => x.Qsa.Count > 1);
+                    listaEmpresas = listaEmpresas.Where(x => x.Qsa.Count > 1).TakeLast(5).ToList();
                     break;
                 case FiltroSocio.UnicoSocio:
-                    CNPJEncontrado = listaCNPJValido.FirstOrDefault(x => x.Qsa != null && x.Qsa.Count == 1);
+                    listaEmpresas = listaEmpresas.Where(x => x.Qsa != null && x.Qsa.Count == 1).TakeLast(5).ToList();
                     break;
             }
-            if(CNPJEncontrado == null)
+            if(listaEmpresas.Count() == 0)
             {
                 throw new CustomException(TipoExcecao.NEGOCIO, "Não há empresas disponíveis para esse filtro.");
             }
+            var randomIndexEmpresa = new Random().Next(0, listaEmpresas.Count() - 1);
+            empresaSelecionada = listaEmpresas[randomIndexEmpresa];
             if (excluirEmpresa)
             {
-                var removeIndex = listaCNPJValido.IndexOf(CNPJEncontrado);
-                redisService.ItemRemove<ReceitaWSResponse>("cnpjs", removeIndex);
+                redisService.ItemRemove<ReceitaWSResponse>("cnpjs", randomIndexEmpresa);
             }
             if (normalizado)
             {
-                return CNPJEncontrado.ObterResponseSalinizado();
+                return empresaSelecionada.ObterResponseSalinizado();
             }
-            return CNPJEncontrado;
+            return empresaSelecionada;
         }
     }
 }
