@@ -33,6 +33,7 @@ namespace GeradorDeDados.Placeholder
                 new StringExecutor("RG", ()=> _faker.Random.String2(8, "0123456789"), "Cria um RG"),
                 new StringExecutor("CPF", ()=> _faker.Person.Cpf(false), "Cria um CPF"),
                 new StringExecutor("CNPJ",()=> _faker.Company.Cnpj(false), "Cria um CNPJ"),
+                new StringExecutor("CNPJ_RECEITAWS",()=> _faker.Company.Cnpj(false), "Cria um CNPJ"),
                 new StringExecutor("COMPANYNAME",()=> _faker.Company.CompanyName(), "Cria um nome de empresa aleatório."),
                 new StringExecutor("BASE64", GetImageAsBase64Url, "Cria um base64 dado uma url de imagem como parâmetro.",
                 new List<string>()

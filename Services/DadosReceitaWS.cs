@@ -21,30 +21,29 @@ namespace GeradorDeDados.Services
         /// <exception cref="CustomException"></exception>
         public ReceitaWSResponse ObterDadosEmpresaRegistrada(FiltroSocio filtroSocio, FiltroSituacao filtroSituacao, bool normalizado, bool excluirEmpresa)
         {
-            var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
-            List<ReceitaWSResponse> listaEmpresas = new List<ReceitaWSResponse>();
+            var listaEmpresas = new List<ReceitaWSResponse>();
+            var listaEmpresasCache = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
             ReceitaWSResponse empresaSelecionada = null;
-
-            if (listaCNPJValido == null)
+            if (listaEmpresasCache.Count() == 0)
             {
                 throw new CustomException(TipoExcecao.NEGOCIO, "Não há empresas disponíveis");
             }
             switch (filtroSituacao)
             {
                 case FiltroSituacao.Ativa:
-                    listaEmpresas = listaEmpresas.Where(x => x.Situacao.Equals("ATIVA")).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Situacao.Equals("ATIVA")).ToList();
                     break;
                 case FiltroSituacao.Baixada:
-                    listaEmpresas = listaEmpresas.Where(x => x.Situacao.Equals("BAIXADA")).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Situacao.Equals("BAIXADA")).ToList();
                     break;
             }
             switch (filtroSocio)
             {
                 case FiltroSocio.VariosSocios:
-                    listaEmpresas = listaEmpresas.Where(x => x.Qsa.Count > 1).TakeLast(5).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa.Count > 1).Take(5).ToList();
                     break;
                 case FiltroSocio.UnicoSocio:
-                    listaEmpresas = listaEmpresas.Where(x => x.Qsa != null && x.Qsa.Count == 1).TakeLast(5).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa != null && x.Qsa.Count == 1).Take(5).ToList();
                     break;
             }
             if(listaEmpresas.Count() == 0)
@@ -55,7 +54,8 @@ namespace GeradorDeDados.Services
             empresaSelecionada = listaEmpresas[randomIndexEmpresa];
             if (excluirEmpresa)
             {
-                redisService.ItemRemove<ReceitaWSResponse>("cnpjs", randomIndexEmpresa);
+                var excluirEmpresaIndex = listaEmpresasCache.IndexOf(empresaSelecionada);
+                redisService.ItemRemove<ReceitaWSResponse>("cnpjs", excluirEmpresaIndex);
             }
             if (normalizado)
             {
