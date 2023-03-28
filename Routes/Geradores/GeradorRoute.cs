@@ -1,7 +1,6 @@
 ﻿using Bogus;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
-using GeradorDeDados.Placeholder;
 using GeradorDeDados.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

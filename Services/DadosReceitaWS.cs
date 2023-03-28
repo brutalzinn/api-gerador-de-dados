@@ -36,14 +36,20 @@ namespace GeradorDeDados.Services
                 case FiltroSituacao.Baixada:
                     listaEmpresas = listaEmpresasCache.Where(x => x.Situacao.Equals("BAIXADA")).ToList();
                     break;
+                default:
+                    listaEmpresas = listaEmpresasCache;
+                    break;
             }
             switch (filtroSocio)
             {
                 case FiltroSocio.VariosSocios:
-                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa.Count > 1).Take(5).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa.Count > 1).ToList();
                     break;
                 case FiltroSocio.UnicoSocio:
-                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa != null && x.Qsa.Count == 1).Take(5).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa != null && x.Qsa.Count == 1).ToList();
+                    break;
+                default:
+                    listaEmpresas = listaEmpresasCache;
                     break;
             }
             if(listaEmpresas.Count() == 0)
