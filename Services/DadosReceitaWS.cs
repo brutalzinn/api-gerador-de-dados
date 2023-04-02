@@ -26,15 +26,15 @@ namespace GeradorDeDados.Services
             ReceitaWSResponse empresaSelecionada = null;
             if (listaEmpresasCache.Count() == 0)
             {
-                throw new CustomException(TipoExcecao.NEGOCIO, "Não há empresas disponíveis");
+                throw new CustomException(TipoExcecao.NEGOCIO, "Não há empresas disponíveis.");
             }
             switch (filtroSituacao)
             {
                 case FiltroSituacao.Ativa:
-                    listaEmpresas = listaEmpresasCache.Where(x => x.Situacao.Equals("ATIVA")).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Situacao.ToLower().Equals("ativa")).ToList();
                     break;
                 case FiltroSituacao.Baixada:
-                    listaEmpresas = listaEmpresasCache.Where(x => x.Situacao.Equals("BAIXADA")).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Situacao.ToLower().Equals("baixada")).ToList();
                     break;
                 default:
                     listaEmpresas = listaEmpresasCache;

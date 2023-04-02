@@ -49,12 +49,16 @@ namespace GeradorDeDados.Works
             try
             {
                 receitaWSResponse = await _receitaWS.ObterDadoEmpresa(cnpj);
-                _logger.LogInformation("{cnpj} {json}", cnpj, JsonSerializer.Serialize(receitaWSResponse));
-                _redisService.ItemAdd("cnpjs", receitaWSResponse);
+                if(receitaWSResponse.Status.ToLower().Equals("error") == false)
+                {
+                    _logger.LogInformation("{cnpj} {json}", cnpj, JsonSerializer.Serialize(receitaWSResponse));
+                    _redisService.ItemAdd("cnpjs", receitaWSResponse);
+                }
+              ;
             }
             catch (Exception e)
             {
-                _logger.LogInformation("{cnpj} não possui registro na receitaWS", cnpj);
+                _logger.LogInformation("{cnpj} falha na solicitação", cnpj);
             }
         }
     }
