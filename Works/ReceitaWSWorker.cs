@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using Bogus.Extensions.Brazil;
 using GeradorDeDados.Integrations.ReceitaWS;
-using GeradorDeDados.Services;
+using GeradorDeDados.Models;
 using System.Text.Json;
 
 namespace GeradorDeDados.Works

@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
-using GeradorDeDados.Services;
+using GeradorDeDados.Services.DadosReceitaWS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestEase.Implementation;

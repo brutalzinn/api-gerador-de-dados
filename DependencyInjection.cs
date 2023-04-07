@@ -1,14 +1,20 @@
 ﻿using ConfigurationSubstitution;
 using GeradorDeDados.Authentication;
 using GeradorDeDados.Integrations.ReceitaWS;
+using GeradorDeDados.Models;
 using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Services;
+using GeradorDeDados.Services.DadosReceitaWS;
 using GeradorDeDados.Works;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using RestEase.HttpClientFactory;
+using StringPlaceholder;
+using StringPlaceholder.FluentPattern;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace GeradorDeDados
@@ -31,6 +37,7 @@ namespace GeradorDeDados
             services.InjetarAutenticacoes();
             services.InjetarServicosDeArmazenamento(config);
             services.InjetarServicos();
+            services.InjetarStringPlaceHolderService();
             services.InjetarSwagger();
             services.InjetarPoliticaCors(config);
         }
@@ -38,11 +45,25 @@ namespace GeradorDeDados
         {
             services.AddAuthorization();
             services.AddSingleton<IRedisService, RedisService>();
-            services.AddSingleton<DadosReceitaWS>();
+            services.AddSingleton<IDadosReceitaWS, DadosReceitaWS>();
             services.AddHostedService<ReceitaWSWorker>();
             services.AddRestEaseClient<IReceitaWS>("https://receitaws.com.br");
             services.AddSingleton<ApiCicloDeVida>();
             services.AddSingleton<ConfigReceitaWS>();
+            services.AddSingleton<Placeholder>();
+
+        }
+
+        private static void InjetarStringPlaceHolderService(this IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var dadosReceitaWS = serviceProvider.GetRequiredService<IDadosReceitaWS>();
+
+            var stringPlaceHolder = new ExecutorCreator().Init()
+                .AddRange(Placeholder.ObterExecutores(dadosReceitaWS))
+                .BuildDescription();
+
+            services.AddSingleton(stringPlaceHolder);
         }
         private static void InjetarAutenticacoes(this IServiceCollection services)
         {

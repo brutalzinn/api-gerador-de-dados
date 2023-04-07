@@ -1,9 +1,9 @@
 ﻿using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
 
-namespace GeradorDeDados.Services
+namespace GeradorDeDados.Services.DadosReceitaWS
 {
-    public class DadosReceitaWS
+    public class DadosReceitaWS : IDadosReceitaWS
     {
         private IRedisService redisService { get; set; }
         public DadosReceitaWS(IRedisService redisService)
@@ -52,7 +52,7 @@ namespace GeradorDeDados.Services
                     listaEmpresas = listaEmpresasCache;
                     break;
             }
-            if(listaEmpresas.Count() == 0)
+            if (listaEmpresas.Count() == 0)
             {
                 throw new CustomException(TipoExcecao.NEGOCIO, "Não há empresas disponíveis para esse filtro.");
             }

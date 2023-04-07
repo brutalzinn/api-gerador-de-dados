@@ -1,4 +1,4 @@
-﻿namespace GeradorDeDados.Services
+﻿namespace GeradorDeDados.Models
 {
     public class ConfigReceitaWS
     {
