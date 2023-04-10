@@ -4,16 +4,12 @@ using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
 using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Services;
-using GeradorDeDados.Services.DadosReceitaWS;
 using GeradorDeDados.Works;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using RestEase.HttpClientFactory;
-using StringPlaceholder;
 using StringPlaceholder.FluentPattern;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -50,7 +46,6 @@ namespace GeradorDeDados
             services.AddRestEaseClient<IReceitaWS>("https://receitaws.com.br");
             services.AddSingleton<ApiCicloDeVida>();
             services.AddSingleton<ConfigReceitaWS>();
-            services.AddSingleton<Placeholder>();
 
         }
 
@@ -63,6 +58,7 @@ namespace GeradorDeDados
                 .AddRange(Placeholder.ObterExecutores(dadosReceitaWS))
                 .BuildDescription();
 
+            services.AddSingleton<Placeholder>();
             services.AddSingleton(stringPlaceHolder);
         }
         private static void InjetarAutenticacoes(this IServiceCollection services)
@@ -105,8 +101,6 @@ namespace GeradorDeDados
                 builder.WithOrigins(apiConfig.CorsOrigin).AllowAnyMethod().AllowAnyHeader();
             }));
         }
-
-
 
         private static void InjetarSwagger(this IServiceCollection services)
         {

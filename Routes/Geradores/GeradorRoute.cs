@@ -1,12 +1,7 @@
-﻿using Bogus;
-using GeradorDeDados.Integrations.ReceitaWS;
-using GeradorDeDados.Models;
-using GeradorDeDados.Services.DadosReceitaWS;
+﻿using GeradorDeDados.Models;
+using GeradorDeDados.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RestEase.Implementation;
-using StringPlaceholder;
-using System.Text.Json;
 
 namespace GeradorDeDados.Routes.Geradores
 {
@@ -17,7 +12,7 @@ namespace GeradorDeDados.Routes.Geradores
             app.MapGet("/obterCNPJValido/{filtroSocio}/{filtroSituacao}/{normalizado}/{excluirEmpresa}",
           [Authorize(AuthenticationSchemes = "ApiKey")]
             (
-              [FromServices] DadosReceitaWS dadosReceitaWS,
+              IDadosReceitaWS dadosReceitaWS,
               [FromRoute] FiltroSocio filtroSocio,
               [FromRoute] FiltroSituacao filtroSituacao,
               [FromRoute] bool normalizado,

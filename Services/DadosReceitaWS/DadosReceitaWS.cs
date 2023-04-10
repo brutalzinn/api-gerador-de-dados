@@ -1,7 +1,7 @@
 ﻿using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
 
-namespace GeradorDeDados.Services.DadosReceitaWS
+namespace GeradorDeDados.Services
 {
     public class DadosReceitaWS : IDadosReceitaWS
     {
@@ -43,10 +43,10 @@ namespace GeradorDeDados.Services.DadosReceitaWS
             switch (filtroSocio)
             {
                 case FiltroSocio.VariosSocios:
-                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa.Count > 1).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa.Count() > 1).ToList();
                     break;
                 case FiltroSocio.UnicoSocio:
-                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa != null && x.Qsa.Count == 1).ToList();
+                    listaEmpresas = listaEmpresasCache.Where(x => x.Qsa != null && x.Qsa.Count() == 1).ToList();
                     break;
                 default:
                     listaEmpresas = listaEmpresasCache;
@@ -65,7 +65,7 @@ namespace GeradorDeDados.Services.DadosReceitaWS
             }
             if (normalizado)
             {
-                return empresaSelecionada.ObterResponseSalinizado();
+                return empresaSelecionada.ObterRespostaNormalizada();
             }
             return empresaSelecionada;
         }

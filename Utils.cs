@@ -27,7 +27,7 @@
         {
             return texto.ToLower();
         }
-        public static string Salinizar(this string texto, bool casoBaixo = true)
+        public static string Normalizar(this string texto, bool casoBaixo = true)
         {
             if (casoBaixo)
             {

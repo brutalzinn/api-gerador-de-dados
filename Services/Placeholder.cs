@@ -1,7 +1,6 @@
 ﻿using Bogus;
 using Bogus.Extensions;
 using Bogus.Extensions.Brazil;
-using GeradorDeDados.Services.DadosReceitaWS;
 using StringPlaceholder;
 using StringPlaceholder.FluentPattern;
 
@@ -9,12 +8,10 @@ namespace GeradorDeDados.Services
 {
     public class Placeholder
     {
-        private readonly IDadosReceitaWS dadosReceitaWS;
         private readonly IExecutorCreator executorCreator;
 
-        public Placeholder(IDadosReceitaWS dadosReceitaWS, IExecutorCreator executorCreator)
+        public Placeholder(IExecutorCreator executorCreator)
         {
-            this.dadosReceitaWS = dadosReceitaWS;
             this.executorCreator = executorCreator;
         }
 

@@ -91,28 +91,28 @@ namespace GeradorDeDados.Integrations.ReceitaWS
         [JsonProperty("billing")]
         public Billing Billing { get; set; }
 
-        public ReceitaWSResponse ObterResponseSalinizado()
+        public ReceitaWSResponse ObterRespostaNormalizada()
         {
             return new ReceitaWSResponse()
             {
-                Abertura = Abertura.Salinizar(),
-                Situacao = Situacao.Salinizar(),
-                SituacaoEspecial = SituacaoEspecial.Salinizar(),
-                Efr = Efr.Salinizar(),
+                Abertura = Abertura.Normalizar(),
+                Situacao = Situacao.Normalizar(),
+                SituacaoEspecial = SituacaoEspecial.Normalizar(),
+                Efr = Efr.Normalizar(),
                 Cnpj = Cnpj.ObterSomenteNumeros(),
                 NaturezaJuridica = NaturezaJuridica.ObterSomenteNumeros(),
-                Tipo = Tipo.Salinizar(),
+                Tipo = Tipo.Normalizar(),
                 Cep = Cep.ObterSomenteNumeros(),
                 MotivoSituacao = string.IsNullOrEmpty(MotivoSituacao) ? "" : MotivoSituacao.Split(" ")[0],
-                Status = Status.Salinizar(),
-                Porte = Porte.Salinizar(),
-                Fantasia = Fantasia.Salinizar(),
-                Logradouro = Logradouro.Salinizar(),
-                Numero = Numero.Salinizar(),
-                Complemento = Complemento.Salinizar(),
-                Bairro = Bairro.Salinizar(),
-                Municipio = Municipio.Salinizar(),
-                Uf = Uf.Salinizar(),
+                Status = Status.Normalizar(),
+                Porte = Porte.Normalizar(),
+                Fantasia = Fantasia.Normalizar(),
+                Logradouro = Logradouro.Normalizar(),
+                Numero = Numero.Normalizar(),
+                Complemento = Complemento.Normalizar(),
+                Bairro = Bairro.Normalizar(),
+                Municipio = Municipio.Normalizar(),
+                Uf = Uf.Normalizar(),
                 Email = Email,
                 Telefone = Telefone.Replace(" ", ""),
                 DataSituacao = DataSituacao,
@@ -124,13 +124,13 @@ namespace GeradorDeDados.Integrations.ReceitaWS
                 AtividadePrincipal = AtividadePrincipal.Select(x =>
                 {
                     x.Code = x.Code.ObterSomenteNumeros();
-                    x.Text = x.Text.Salinizar();
+                    x.Text = x.Text.Normalizar();
                     return x;
                 }).ToList(),
                 AtividadesSecundarias = AtividadesSecundarias.Select(x =>
                 {
                     x.Code = x.Code.ObterSomenteNumeros();
-                    x.Text = x.Text.Salinizar();
+                    x.Text = x.Text.Normalizar();
                     return x;
                 }).ToList(),
 
