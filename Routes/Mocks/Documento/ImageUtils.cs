@@ -1,6 +1,6 @@
 ﻿
 
-using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace DocumentoMock
 {
@@ -25,7 +25,7 @@ namespace DocumentoMock
                 // Save the modified image to a memory stream
                 using (var memoryStream = new MemoryStream())
                 {
-                    image.Save(memoryStream, new PngEncoder());
+                    image.Save(memoryStream, new JpegEncoder());
 
                     // Convert the memory stream to a base64 string
                     var base64String = Convert.ToBase64String(memoryStream.ToArray());
