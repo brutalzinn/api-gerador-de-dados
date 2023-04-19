@@ -21,7 +21,7 @@ namespace GeradorDeDados.Routes.Mocks.Documento
                     nomeDocumento = "verso.jpg";
                     break;
                 case TipoDocumento.RG_FRENTE:
-                    nomeDocumento = "verso.jpg";
+                    nomeDocumento = "frente.jpg";
                     break;
                 default:
                     nomeDocumento = "selfie.jpg";
