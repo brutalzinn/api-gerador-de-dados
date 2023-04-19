@@ -20,4 +20,10 @@
         AUTORIZACAO = 401,
         INTERNO = 500
     }
+    public enum TipoDocumento
+    {
+        SELFIE,
+        RG_FRENTE,
+        RG_VERSO
+    }
 }

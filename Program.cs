@@ -1,13 +1,9 @@
 using GeradorDeDados;
 using GeradorDeDados.Handlers;
-using GeradorDeDados.Integrations.ReceitaWS;
-using GeradorDeDados.Models;
 using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Routes.Configuracoes;
 using GeradorDeDados.Routes.Geradores;
-using GeradorDeDados.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using GeradorDeDados.Routes.Mocks.Documento;
 using Microsoft.Extensions.Options;
 
 internal class Program
@@ -30,6 +26,7 @@ internal class Program
         ConfiguracaoRoute.CriarRota(app);
         GeradorRoute.CriarRota(app);
         PlaceholderRoute.CriarRota(app);
+        DocumentoMockRoute.CriarRota(app);
         app.Run();
     }
 }
