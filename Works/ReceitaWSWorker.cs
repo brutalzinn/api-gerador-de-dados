@@ -30,11 +30,6 @@ namespace GeradorDeDados.Works
             _logger.LogInformation("Serviço iniciado");
             while (true)
             {
-                if (_configReceitaWSService.WorkerAtivo)
-                {
-                    _logger.LogInformation("Serviço rodando em {time}", DateTimeOffset.Now);
-                    await GerarCNPJValido();
-                }
                 if (_configReceitaWSService.ReceitaWSAutoFill.AutoFill)
                 {
                     var min = _configReceitaWSService.ReceitaWSAutoFill.MinFill;
@@ -42,6 +37,12 @@ namespace GeradorDeDados.Works
                     var quantity = _redisService.Get<List<ReceitaWSResponse>?>("cnpjs")?.Count() ?? 0;
                     var autoFill = quantity >= min && quantity <= max;
                     _configReceitaWSService.WorkerAtivo = autoFill;
+                    _logger.LogInformation("Alterando worker para {autoFill}", autoFill);
+                }
+                if (_configReceitaWSService.WorkerAtivo)
+                {
+                    _logger.LogInformation("Serviço rodando em {time}", DateTimeOffset.Now);
+                    await GerarCNPJValido();
                 }
                 await Task.Delay(TimeSpan.FromSeconds(20));
             }
