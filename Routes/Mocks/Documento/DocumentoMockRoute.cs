@@ -1,5 +1,6 @@
-﻿using DocumentoMock;
+﻿using GeradorDeDados.Mocks.Utils;
 using GeradorDeDados.Models;
+using GeradorDeDados.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GeradorDeDados.Routes.Mocks.Documento
@@ -29,8 +30,8 @@ namespace GeradorDeDados.Routes.Mocks.Documento
             }
 
             var documento = Path.Combine("Mocks", "Documento", nomeDocumento);
-            var documentoBase64 = ImageUtils.AddRandomDotToImage(documento);
-            return new DocumentoMockResponse
+            var documentoBase64 = ImageUtil.AddRandomDots(documento);
+            return new DocumentoMock
             {
                 TipoDocumento = tipoDocumento,
                 Base64 = documentoBase64

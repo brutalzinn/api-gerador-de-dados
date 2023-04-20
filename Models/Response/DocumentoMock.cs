@@ -1,6 +1,6 @@
-﻿namespace GeradorDeDados.Models
+﻿namespace GeradorDeDados.Models.Response
 {
-    public class DocumentoMockResponse
+    public class DocumentoMock
     {
         public TipoDocumento TipoDocumento { get; set; }
         public string Base64 { get; set; }

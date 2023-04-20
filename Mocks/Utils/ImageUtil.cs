@@ -1,15 +1,13 @@
-﻿
+﻿using SixLabors.ImageSharp.Formats.Jpeg;
 
-using SixLabors.ImageSharp.Formats.Jpeg;
-
-namespace DocumentoMock
+namespace GeradorDeDados.Mocks.Utils
 {
-    public class ImageUtils
+    public class ImageUtil
     {
         /// <summary>
-        ///     thanks chat gpt!
+        /// thanks chat gpt!
         /// </summary>
-        public static string AddRandomDotToImage(string imagePath)
+        public static string AddRandomDots(string imagePath)
         {
             // Load the image file using ImageSharp
             using (var image = Image.Load<Rgba32>(imagePath))

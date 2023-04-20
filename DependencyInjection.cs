@@ -1,4 +1,5 @@
 ﻿using ConfigurationSubstitution;
+using Cronos;
 using GeradorDeDados.Authentication;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
@@ -6,6 +7,7 @@ using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Services;
 using GeradorDeDados.Works;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -35,7 +37,7 @@ namespace GeradorDeDados
             services.InjetarServicos();
             services.InjetarStringPlaceHolderService();
             services.InjetarSwagger();
-            services.InjetarPoliticaCors(config);
+            services.InjetarPoliticaCors();
         }
         private static void InjetarServicos(this IServiceCollection services)
         {
@@ -45,7 +47,7 @@ namespace GeradorDeDados
             services.AddHostedService<ReceitaWSWorker>();
             services.AddRestEaseClient<IReceitaWS>("https://receitaws.com.br");
             services.AddSingleton<ApiCicloDeVida>();
-            services.AddSingleton<ConfigReceitaWS>();
+            services.AddSingleton<ReceitaWSConfig>();
 
         }
 
@@ -70,6 +72,14 @@ namespace GeradorDeDados
         }
         private static void InjetarServicosDeArmazenamento(this IServiceCollection services, IConfigurationRoot config)
         {
+            var serviceProvider = services.BuildServiceProvider();
+            var apiConfig = serviceProvider.GetRequiredService<IOptions<ApiConfig>>().Value;
+            var cronParsed = CronExpression.Parse(apiConfig.CacheConfig.ExpireEvery);
+            var distributedCacheEntry = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpiration = cronParsed.GetNextOccurrence(DateTime.UtcNow),
+            };
+            services.AddSingleton(distributedCacheEntry);
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = ObterRedisContext();
@@ -92,7 +102,7 @@ namespace GeradorDeDados
             services.Configure<ApiConfig>(options => config.GetSection("ApiConfig").Bind(options));
         }
 
-        private static void InjetarPoliticaCors(this IServiceCollection services, IConfigurationRoot config)
+        private static void InjetarPoliticaCors(this IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
             var apiConfig = serviceProvider.GetRequiredService<IOptions<ApiConfig>>().Value;

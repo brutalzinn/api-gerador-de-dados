@@ -1,4 +1,4 @@
-﻿namespace GeradorDeDados.Models
+﻿namespace GeradorDeDados.Models.Exceptions
 {
     [Serializable]
     public class CustomException : Exception
@@ -18,7 +18,7 @@
             var response = new CustomExceptionResponse()
             {
                 Tipo = GetType(),
-                Mensagem = Message
+                Mensagem = base.Message
             };
 
             return response;
@@ -38,5 +38,12 @@
             }
             return "not_recognized";
         }
+
+
+    }
+    public class CustomExceptionResponse
+    {
+        public string Tipo { get; set; }
+        public string Mensagem { get; set; }
     }
 }

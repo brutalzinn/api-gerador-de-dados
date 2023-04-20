@@ -1,4 +1,4 @@
-﻿using GeradorDeDados.Models;
+﻿using GeradorDeDados.Models.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 
 namespace GeradorDeDados.Handlers

@@ -6,40 +6,27 @@ namespace GeradorDeDados
     public class RedisService : IRedisService
     {
         private readonly IDistributedCache _redisCache;
+        private readonly DistributedCacheEntryOptions _distributedCacheEntry;
 
-        public RedisService(IDistributedCache redisDatabase)
+        public RedisService(IDistributedCache redisCache, DistributedCacheEntryOptions distributedCacheEntry)
         {
-            _redisCache = redisDatabase;
+            _redisCache = redisCache;
+            _distributedCacheEntry = distributedCacheEntry;
         }
 
         public T Get<T>(string chave)
         {
             var value = _redisCache.GetString(chave);
-
             if (value != null)
             {
                 return JsonSerializer.Deserialize<T>(value);
             }
             return default;
-
         }
 
-        public T Set<T>(string chave, T valor, int expiracao)
+        public void Set<T>(string chave, T valor)
         {
-            var timeOut = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24),
-                SlidingExpiration = TimeSpan.FromSeconds(expiracao)
-            };
-
-            _redisCache.SetString(chave, JsonSerializer.Serialize(valor), timeOut);
-            return valor;
-        }
-
-        public T Set<T>(string chave, T valor)
-        {
-            _redisCache.SetString(chave, JsonSerializer.Serialize(valor));
-            return valor;
+            _redisCache.SetString(chave, JsonSerializer.Serialize(valor), _distributedCacheEntry);
         }
 
         public bool Clear(string chave)
@@ -60,23 +47,18 @@ namespace GeradorDeDados
         /// <param name="chave"></param>
         /// <param name="valor"></param>
         /// <returns></returns>
-        public T ItemAdd<T>(string chave, T valor)
+        public void ItemAdd<T>(string chave, T valor)
         {
             var value = _redisCache.GetString(chave);
-
+            var lista = new List<T>();
             if (value != null)
             {
-                var lista = JsonSerializer.Deserialize<List<T>>(value);
+                lista = JsonSerializer.Deserialize<List<T>>(value);
                 lista.Add(valor);
-                _redisCache.SetString(chave, JsonSerializer.Serialize(lista));
+                _redisCache.SetString(chave, JsonSerializer.Serialize(lista), _distributedCacheEntry);
             }
-            else
-            {
-                var lista = new List<T>();
-                lista.Add(valor);
-                _redisCache.SetString(chave, JsonSerializer.Serialize(lista));
-            }
-            return default;
+            lista.Add(valor);
+            _redisCache.SetString(chave, JsonSerializer.Serialize(lista), _distributedCacheEntry);
         }
 
 
@@ -90,13 +72,14 @@ namespace GeradorDeDados
         public void ItemRemove<T>(string chave, int index)
         {
             var value = _redisCache.GetString(chave);
-
             if (value != null)
             {
-                var lista = JsonSerializer.Deserialize<List<T>>(value);
-                lista.RemoveAt(index);
-                _redisCache.SetString(chave, JsonSerializer.Serialize(lista));
+                return;
             }
+            var lista = JsonSerializer.Deserialize<List<T>>(value);
+            lista.RemoveAt(index);
+            _redisCache.SetString(chave, JsonSerializer.Serialize(lista));
+
         }
     }
 }

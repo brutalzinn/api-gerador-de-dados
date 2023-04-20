@@ -1,5 +1,7 @@
 ﻿using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models;
+using GeradorDeDados.Models.Exceptions;
+using GeradorDeDados.Models.Response;
 
 namespace GeradorDeDados.Services
 {
@@ -68,6 +70,26 @@ namespace GeradorDeDados.Services
                 return empresaSelecionada.ObterRespostaNormalizada();
             }
             return empresaSelecionada;
+        }
+
+        public DadosEmpresasRegistradas ObterDadosEmpresasRegistradas()
+        {
+            int quantidadeCnpjs = 0;
+            int quantidadeUnicoSocio = 0;
+            int quantidadeVariosSocios = 0;
+            var listaEmpresasCache = redisService.Get<List<ReceitaWSResponse>?>("cnpjs");
+            if (listaEmpresasCache != null)
+            {
+                quantidadeCnpjs = listaEmpresasCache.Count();
+                quantidadeUnicoSocio = listaEmpresasCache.Count(x => x.Qsa != null && x.Qsa.Count() == 1);
+                quantidadeVariosSocios = listaEmpresasCache.Count(x => x.Qsa.Count() > 1);
+            }
+            return new DadosEmpresasRegistradas
+            {
+                QuantidadeCnpjs = quantidadeCnpjs,
+                QuantidadeUnicoSocio = quantidadeUnicoSocio,
+                QuantidadeVariosSocios = quantidadeVariosSocios
+            };
         }
     }
 }

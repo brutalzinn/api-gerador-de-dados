@@ -1,9 +1,9 @@
-﻿using GeradorDeDados.Integrations.ReceitaWS;
-using GeradorDeDados.Models;
+﻿using GeradorDeDados.Models;
+using GeradorDeDados.Models.Request;
+using GeradorDeDados.Models.Response;
 using GeradorDeDados.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace GeradorDeDados.Routes.Configuracoes
 {
@@ -11,9 +11,10 @@ namespace GeradorDeDados.Routes.Configuracoes
     {
         public static void CriarRota(this WebApplication app)
         {
-            app.MapPost("/ReceitaWSBackgroundWorker", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromBody] ConfigReceitaWSRequest request, [FromServices] ConfigReceitaWS configReceitaWSService, [FromServices] IRedisService redisService) =>
+            app.MapPost("/ReceitaWSBackgroundWorker", [Authorize(AuthenticationSchemes = "ApiKey")] ([FromBody] WorkerConfig request, [FromServices] ReceitaWSConfig configReceitaWSService, [FromServices] IRedisService redisService) =>
         {
             configReceitaWSService.WorkerAtivo = request.WorkerAtivo;
+            configReceitaWSService.ReceitaWSAutoFill = request.ReceitaWSAutoFill;
             return Results.Ok();
         }).WithTags("Configurações")
           .WithOpenApi(options =>
@@ -23,23 +24,18 @@ namespace GeradorDeDados.Routes.Configuracoes
                return options;
            });
 
-            app.MapGet("/", ([FromServices] ApiCicloDeVida apiCicloDeVida, [FromServices] ConfigReceitaWS configReceitaWSService, [FromServices] IRedisService redisService) =>
+            app.MapGet("/", ([FromServices] ApiCicloDeVida apiCicloDeVida, [FromServices] ReceitaWSConfig receitaWSConfig, IDadosReceitaWS dadosReceitaWS) =>
             {
                 var ultimoDeploy = "Último deploy " + apiCicloDeVida.iniciouEm.ToString("dd/MM/yyyy HH:mm:ss");
                 var upTime = DateTime.Now.Subtract(apiCicloDeVida.iniciouEm).ToString("c");
                 var ambiente = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-                var listaCNPJValido = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
-                int cnpjsRegistrados = 0;
-                if (listaCNPJValido != null)
-                {
-                    cnpjsRegistrados = redisService.Get<List<ReceitaWSResponse>>("cnpjs").ToList().Count;
-                }
-                return Results.Ok(new HealthCheckResponse()
+                var dadosEmpresa = dadosReceitaWS.ObterDadosEmpresasRegistradas();
+                return Results.Ok(new HealthCheck()
                 {
                     UltimoDeploy = ultimoDeploy,
                     UpTime = upTime,
-                    WorkerAtivo = configReceitaWSService.WorkerAtivo,
-                    CnpjsRegistrados = cnpjsRegistrados,
+                    ReceitaWSConfig = receitaWSConfig,
+                    DadosEmpresasRegistradas = dadosEmpresa,
                     Ambiente = ambiente
 
                 });
