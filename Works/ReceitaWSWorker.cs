@@ -1,8 +1,14 @@
 ﻿using Bogus;
 using Bogus.Extensions.Brazil;
 using GeradorDeDados.Integrations.ReceitaWS;
-using GeradorDeDados.Models;
+using GeradorDeDados.Integrations.ReceitaWS.Models;
+using GeradorDeDados.Services;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GeradorDeDados.Works
 {
@@ -30,15 +36,6 @@ namespace GeradorDeDados.Works
             _logger.LogInformation("Serviço iniciado");
             while (true)
             {
-                if (_configReceitaWSService.ReceitaWSAutoFill.AutoFill)
-                {
-                    var min = _configReceitaWSService.ReceitaWSAutoFill.MinFill;
-                    var max = _configReceitaWSService.ReceitaWSAutoFill.MaxFill;
-                    var quantity = _redisService.Get<List<ReceitaWSResponse>?>("cnpjs")?.Count() ?? 0;
-                    var autoFill = quantity >= min && quantity <= max;
-                    _configReceitaWSService.WorkerAtivo = autoFill;
-                    _logger.LogInformation("Alterando worker para {autoFill}", autoFill);
-                }
                 if (_configReceitaWSService.WorkerAtivo)
                 {
                     _logger.LogInformation("Serviço rodando em {time}", DateTimeOffset.Now);
@@ -64,7 +61,7 @@ namespace GeradorDeDados.Works
             }
             catch (Exception e)
             {
-                _logger.LogInformation("{cnpj} falha na solicitação", cnpj);
+                _logger.LogInformation("{0} falha na solicitação: {1}", cnpj, e);
             }
         }
     }

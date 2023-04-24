@@ -1,4 +1,6 @@
-﻿namespace GeradorDeDados.Models.Response
+﻿using GeradorDeDados.Services;
+
+namespace GeradorDeDados.Models.Response
 {
     public class HealthCheck
     {

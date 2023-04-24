@@ -1,4 +1,8 @@
-﻿using SixLabors.ImageSharp.Formats.Jpeg;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
+using System;
+using System.IO;
 
 namespace GeradorDeDados.Mocks.Utils
 {
@@ -12,12 +16,11 @@ namespace GeradorDeDados.Mocks.Utils
             // Load the image file using ImageSharp
             using (var image = Image.Load<Rgba32>(imagePath))
             {
-                // Generate a random x-coordinate and y-coordinate within the image
+                // Generate some random pixels to image
+
                 Random random = new Random();
                 int x = random.Next(image.Width);
                 int y = random.Next(image.Height);
-
-                // Set the pixel at the specified x-coordinate and y-coordinate to black
                 image[x, y] = Color.Black;
 
                 // Save the modified image to a memory stream

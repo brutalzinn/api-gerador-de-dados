@@ -2,25 +2,27 @@
 using Cronos;
 using GeradorDeDados.Authentication;
 using GeradorDeDados.Integrations.ReceitaWS;
-using GeradorDeDados.Models;
 using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Services;
 using GeradorDeDados.Works;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using RestEase.HttpClientFactory;
 using StringPlaceholder.FluentPattern;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GeradorDeDados
 {
     public static class DependencyInjection
     {
-
-
         public static void CriarInjecao(this IServiceCollection services)
         {
             var config = new ConfigurationBuilder()
@@ -45,6 +47,7 @@ namespace GeradorDeDados
             services.AddSingleton<IRedisService, RedisService>();
             services.AddSingleton<IDadosReceitaWS, DadosReceitaWS>();
             services.AddHostedService<ReceitaWSWorker>();
+            services.AddHostedService<ReceitaWSAutoFillWorker>();
             services.AddRestEaseClient<IReceitaWS>("https://receitaws.com.br");
             services.AddSingleton<ApiCicloDeVida>();
             services.AddSingleton<ReceitaWSConfig>();

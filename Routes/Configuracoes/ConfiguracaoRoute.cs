@@ -1,9 +1,11 @@
-﻿using GeradorDeDados.Models;
-using GeradorDeDados.Models.Request;
+﻿using GeradorDeDados.Models.Request;
 using GeradorDeDados.Models.Response;
 using GeradorDeDados.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace GeradorDeDados.Routes.Configuracoes
 {

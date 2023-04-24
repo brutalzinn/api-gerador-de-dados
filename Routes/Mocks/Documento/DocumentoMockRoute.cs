@@ -1,7 +1,10 @@
 ﻿using GeradorDeDados.Mocks.Utils;
 using GeradorDeDados.Models;
 using GeradorDeDados.Models.Response;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 
 namespace GeradorDeDados.Routes.Mocks.Documento
 {

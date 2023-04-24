@@ -3,6 +3,9 @@ using Bogus.Extensions;
 using Bogus.Extensions.Brazil;
 using StringPlaceholder;
 using StringPlaceholder.FluentPattern;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
 
 namespace GeradorDeDados.Services
 {

@@ -1,4 +1,4 @@
-﻿using GeradorDeDados.Integrations.ReceitaWS;
+﻿using GeradorDeDados.Integrations.ReceitaWS.Models;
 using GeradorDeDados.Models;
 using GeradorDeDados.Models.Response;
 

@@ -1,4 +1,6 @@
-﻿using RestEase;
+﻿using GeradorDeDados.Integrations.ReceitaWS.Models;
+using RestEase;
+using System.Threading.Tasks;
 
 namespace GeradorDeDados.Integrations.ReceitaWS
 {

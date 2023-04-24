@@ -1,5 +1,7 @@
 ﻿using GeradorDeDados.Models.Exceptions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
 
 namespace GeradorDeDados.Handlers
 {
@@ -17,7 +19,7 @@ namespace GeradorDeDados.Handlers
                 {
                     context.Response.StatusCode = customException.StatusCode;
                     await context.Response.WriteAsJsonAsync(customException.ObterResponse());
-                }            
+                }
             }));
         }
 

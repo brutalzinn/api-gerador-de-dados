@@ -1,4 +1,6 @@
-﻿namespace GeradorDeDados
+﻿using System.Linq;
+
+namespace GeradorDeDados
 {
     public static class Utils
     {
@@ -14,7 +16,7 @@
             {
                 var letra = texto[i];
 
-                if (Char.IsDigit(letra))
+                if (char.IsDigit(letra))
                 {
                     resultado += letra;
                 }

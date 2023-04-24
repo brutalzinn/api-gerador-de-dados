@@ -1,9 +1,10 @@
 ﻿using GeradorDeDados.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using StringPlaceholder;
+using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 
 namespace GeradorDeDados.Routes.Geradores
 {
@@ -26,7 +27,7 @@ namespace GeradorDeDados.Routes.Geradores
                  .WithOpenApi(options =>
                  {
                      var placeholder = app.Services.GetRequiredService<Placeholder>();
-                     var descricao = placeholder.ObterDescricao();       
+                     var descricao = placeholder.ObterDescricao();
                      options.Summary = "Permite criar um texto com o uso de placeholders.";
                      options.Description = $"{descricao}";
                      return options;

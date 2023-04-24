@@ -1,4 +1,6 @@
-﻿namespace GeradorDeDados.Models.Exceptions
+﻿using System;
+
+namespace GeradorDeDados.Models.Exceptions
 {
     [Serializable]
     public class CustomException : Exception

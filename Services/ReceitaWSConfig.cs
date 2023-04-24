@@ -1,4 +1,6 @@
-﻿namespace GeradorDeDados.Models
+﻿using GeradorDeDados.Models;
+
+namespace GeradorDeDados.Services
 {
     public class ReceitaWSConfig
     {

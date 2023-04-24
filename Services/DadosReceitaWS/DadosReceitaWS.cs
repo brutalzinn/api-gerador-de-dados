@@ -1,7 +1,10 @@
-﻿using GeradorDeDados.Integrations.ReceitaWS;
+﻿using GeradorDeDados.Integrations.ReceitaWS.Models;
 using GeradorDeDados.Models;
 using GeradorDeDados.Models.Exceptions;
 using GeradorDeDados.Models.Response;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GeradorDeDados.Services
 {
@@ -77,7 +80,7 @@ namespace GeradorDeDados.Services
             int quantidadeCnpjs = 0;
             int quantidadeUnicoSocio = 0;
             int quantidadeVariosSocios = 0;
-            var listaEmpresasCache = redisService.Get<List<ReceitaWSResponse>?>("cnpjs");
+            var listaEmpresasCache = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
             if (listaEmpresasCache != null)
             {
                 quantidadeCnpjs = listaEmpresasCache.Count();

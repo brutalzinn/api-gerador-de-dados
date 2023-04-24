@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace GeradorDeDados

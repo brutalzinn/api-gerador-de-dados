@@ -4,6 +4,8 @@ using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Routes.Configuracoes;
 using GeradorDeDados.Routes.Geradores;
 using GeradorDeDados.Routes.Mocks.Documento;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 internal class Program
