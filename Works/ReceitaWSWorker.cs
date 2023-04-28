@@ -34,18 +34,15 @@ namespace GeradorDeDados.Works
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Serviço iniciado");
-            while (true)
+            while (_configReceitaWSService.WorkerAtivo)
             {
-                if (_configReceitaWSService.WorkerAtivo)
-                {
-                    _logger.LogInformation("Serviço rodando em {time}", DateTimeOffset.Now);
-                    await GerarCNPJValido();
-                }
+                _logger.LogInformation("Serviço rodando em {time}", DateTimeOffset.Now);
+                await GerarCNPJValido();
                 await Task.Delay(TimeSpan.FromSeconds(20));
             }
         }
 
-        public async Task GerarCNPJValido()
+        private async Task GerarCNPJValido()
         {
             var cnpj = _faker.Company.Cnpj(false);
             ReceitaWSResponse receitaWSResponse;

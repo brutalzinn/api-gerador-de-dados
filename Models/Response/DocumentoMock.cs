@@ -2,7 +2,7 @@
 {
     public class DocumentoMock
     {
-        public TipoDocumento TipoDocumento { get; set; }
+        public NomeDocumento TipoDocumento { get; set; }
         public string Base64 { get; set; }
     }
 }

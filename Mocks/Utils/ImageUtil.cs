@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using GeradorDeDados.Models.Exceptions;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
@@ -9,29 +10,24 @@ namespace GeradorDeDados.Mocks.Utils
     public class ImageUtil
     {
         /// <summary>
-        /// thanks chat gpt!
+        /// chat gpt me deu uma mãozinha aqui.
         /// </summary>
         public static string AddRandomDots(string imagePath)
         {
-            // Load the image file using ImageSharp
+            if (File.Exists(imagePath) == false)
+            {
+                throw new CustomException(Models.TipoExcecao.NEGOCIO, "Arquivo não encontrado no caminho informado.");
+            }
             using (var image = Image.Load<Rgba32>(imagePath))
             {
-                // Generate some random pixels to image
-
                 Random random = new Random();
                 int x = random.Next(image.Width);
                 int y = random.Next(image.Height);
                 image[x, y] = Color.Black;
-
-                // Save the modified image to a memory stream
                 using (var memoryStream = new MemoryStream())
                 {
                     image.Save(memoryStream, new JpegEncoder());
-
-                    // Convert the memory stream to a base64 string
                     var base64String = Convert.ToBase64String(memoryStream.ToArray());
-
-                    // Return the base64 string
                     return base64String;
                 }
             }

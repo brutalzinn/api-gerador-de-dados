@@ -1,4 +1,6 @@
-﻿namespace GeradorDeDados.Models
+﻿using System.ComponentModel;
+
+namespace GeradorDeDados.Models
 {
     public enum FiltroSocio
     {
@@ -20,10 +22,15 @@
         AUTORIZACAO = 401,
         INTERNO = 500
     }
-    public enum TipoDocumento
+    public enum NomeDocumento
     {
-        SELFIE,
+        [Description("selfie.jpg")]
+        SELFIE = 1,
+        [Description("rg_frente.jpg")]
         RG_FRENTE,
-        RG_VERSO
+        [Description("rg_verso.jpg")]
+        RG_VERSO,
+        [Description("lorem-ipsum.pdf")]
+        PDF
     }
 }

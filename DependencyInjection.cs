@@ -4,6 +4,7 @@ using GeradorDeDados.Authentication;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Services;
+using GeradorDeDados.Services.Mocks;
 using GeradorDeDados.Works;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Caching.Distributed;
@@ -46,6 +47,7 @@ namespace GeradorDeDados
             services.AddAuthorization();
             services.AddSingleton<IRedisService, RedisService>();
             services.AddSingleton<IDadosReceitaWS, DadosReceitaWS>();
+            services.AddSingleton<IGeradorDocumentoMock, GeradorDocumentoMock>();
             services.AddHostedService<ReceitaWSWorker>();
             services.AddHostedService<ReceitaWSAutoFillWorker>();
             services.AddRestEaseClient<IReceitaWS>("https://receitaws.com.br");

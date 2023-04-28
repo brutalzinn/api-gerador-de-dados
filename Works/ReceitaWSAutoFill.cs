@@ -27,7 +27,7 @@ namespace GeradorDeDados.Works
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Serviço de autofill iniciado");
-            while (true)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 if (_configReceitaWSService.ReceitaWSAutoFill.AutoFill)
                 {

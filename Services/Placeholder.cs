@@ -1,6 +1,8 @@
 ﻿using Bogus;
 using Bogus.Extensions;
 using Bogus.Extensions.Brazil;
+using GeradorDeDados.Models;
+using GeradorDeDados.Services.Mocks;
 using StringPlaceholder;
 using StringPlaceholder.FluentPattern;
 using System;
@@ -12,6 +14,7 @@ namespace GeradorDeDados.Services
     public class Placeholder
     {
         private readonly IExecutorCreator executorCreator;
+        private static readonly IGeradorDocumentoMock geradorDocumentoMock;
 
         public Placeholder(IExecutorCreator executorCreator)
         {
@@ -76,6 +79,16 @@ namespace GeradorDeDados.Services
                 new List<string>()
                 {
                 "imageUrl"
+                }),
+                  new StringExecutor("DOCUMENTO_MOCK", GerarDocumento, "Cria uma imagem com pixels gerados aleatoriamente</br>" +
+                  "arquivos disponíveis: </br>" +
+                  "lorem-ipsum.pdf</br>" +
+                  "rg_frente.jpg</br>" +
+                  "rg_verso.jpg</br>"+
+                  "selfie.jpg",
+                new List<string>()
+                {
+                "NomeDocumento"
                 })
             };
         }
@@ -87,6 +100,14 @@ namespace GeradorDeDados.Services
                 var bytes = client.GetByteArrayAsync(strParams[0]).Result;
                 return Convert.ToBase64String(bytes);
             }
+        }
+        private static string GerarDocumento(string[] strParams)
+        {
+            var tipoDocumento = Utils.ObterEnumPorDescricao<NomeDocumento>(strParams[0]);
+            var geradorDeDocumento = new GeradorDocumentoMock();
+            var documento = geradorDeDocumento.GerarDocumento(tipoDocumento);
+            var resultado = documento.Base64;
+            return resultado;
         }
     }
 }

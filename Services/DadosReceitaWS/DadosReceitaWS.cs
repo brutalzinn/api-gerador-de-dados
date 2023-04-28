@@ -29,7 +29,7 @@ namespace GeradorDeDados.Services
             var listaEmpresas = new List<ReceitaWSResponse>();
             var listaEmpresasCache = redisService.Get<List<ReceitaWSResponse>>("cnpjs");
             ReceitaWSResponse empresaSelecionada = null;
-            if (listaEmpresasCache.Count() == 0)
+            if (listaEmpresasCache == null || listaEmpresasCache.Count() == 0)
             {
                 throw new CustomException(TipoExcecao.NEGOCIO, "Não há empresas disponíveis.");
             }
