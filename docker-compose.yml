@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./:/app
     ports:
       - "5556:80"
     links:

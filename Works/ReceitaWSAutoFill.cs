@@ -34,7 +34,7 @@ namespace GeradorDeDados.Works
                     var min = _configReceitaWSService.ReceitaWSAutoFill.MinFill;
                     var max = _configReceitaWSService.ReceitaWSAutoFill.MaxFill;
                     var quantity = _redisService.Get<List<ReceitaWSResponse>>("cnpjs")?.Count() ?? 0;
-                    var autoFill = quantity >= min && quantity <= max;
+                    var autoFill = quantity <= min && quantity <= max;
                     _configReceitaWSService.WorkerAtivo = autoFill;
                     _logger.LogInformation("Alterando worker para {autoFill}", autoFill);
                 }
