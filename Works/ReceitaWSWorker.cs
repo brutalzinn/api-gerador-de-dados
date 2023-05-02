@@ -57,7 +57,6 @@ namespace GeradorDeDados.Works
                     _logger.LogInformation("{cnpj} {json}", cnpj, JsonSerializer.Serialize(receitaWSResponse));
                     _redisService.ItemAdd("cnpjs", receitaWSResponse);
                 }
-              ;
             }
             catch (Exception e)
             {
