@@ -2,8 +2,8 @@
 {
     public class ReceitaWSAutoFill
     {
-        public bool AutoFill { get; set; }
-        public int MinFill { get; set; }
-        public int MaxFill { get; set; }
+        public bool AutoFill { get; set; } = true
+        public int MinFill { get; set; } = 1000
+        public int MaxFill { get; set; } = 2000
     }
 }
