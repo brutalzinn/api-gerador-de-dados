@@ -36,7 +36,7 @@ namespace GeradorDeDados.Works
             _logger.LogInformation("Serviço ReceitaWSWorker iniciado");
             while (!stoppingToken.IsCancellationRequested)
             {
-                if(configReceitaWSService.WorkerAtivo)
+                if(_configReceitaWSService.WorkerAtivo)
                 {
                     _logger.LogInformation("Serviço ReceitaWSWorker rodando em {time}", DateTimeOffset.Now);
                     await GerarCNPJValido();
