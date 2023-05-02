@@ -33,11 +33,14 @@ namespace GeradorDeDados.Works
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Serviço iniciado");
-            while (_configReceitaWSService.WorkerAtivo)
+            _logger.LogInformation("Serviço ReceitaWSWorker iniciado");
+            while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Serviço rodando em {time}", DateTimeOffset.Now);
-                await GerarCNPJValido();
+                if(configReceitaWSService.WorkerAtivo)
+                {
+                    _logger.LogInformation("Serviço ReceitaWSWorker rodando em {time}", DateTimeOffset.Now);
+                    await GerarCNPJValido();
+                }
                 await Task.Delay(TimeSpan.FromSeconds(20));
             }
         }
