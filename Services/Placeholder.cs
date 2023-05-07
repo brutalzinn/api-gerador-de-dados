@@ -2,6 +2,7 @@
 using Bogus.Extensions;
 using Bogus.Extensions.Brazil;
 using GeradorDeDados.Models;
+using GeradorDeDados.Models.Exceptions;
 using GeradorDeDados.Services.Mocks;
 using StringPlaceholder;
 using StringPlaceholder.FluentPattern;
@@ -85,15 +86,19 @@ namespace GeradorDeDados.Services
                 {
                 "imageUrl"
                 }),
-                  new StringExecutor("IMAGEM_DOCUMENTO_MOCK", GerarDocumentoRandom, "Cria uma imagem com pixels gerados aleatoriamente</br>" +
+                  new StringExecutor("IMAGEM_DOCUMENTO_MOCK", GerarImagemRandom, "Cria uma imagem com pixels gerados aleatoriamente</br>" +
                   "arquivos disponíveis: </br>" +
-                  "pdf</br>" +
                   "rg_frente</br>" +
                   "rg_verso</br>"+
                   "selfie",
                 new List<string>()
                 {
                 "tipoDocumento"
+                }),
+                new StringExecutor("PDF_DOCUMENTO_MOCK", GerarDocumentoRandom, "Cria um pdf com tamanho específico de um lorem ipsum dor em KBS </br>",
+                new List<string>()
+                {
+                "tamanho_em_kbs"
                 })
             };
         }
@@ -106,11 +111,29 @@ namespace GeradorDeDados.Services
                 return Convert.ToBase64String(bytes);
             }
         }
-        private static string GerarDocumentoRandom(string[] strParams)
+        private static string GerarImagemRandom(string[] strParams)
         {
             var tipoDocumento = Utils.ObterEnumPorDescricao<TipoDocumento>(strParams[0]);
             var geradorDeDocumento = new GeradorDocumentoMock();
             var documento = geradorDeDocumento.GerarDocumento(tipoDocumento);
+            var resultado = documento.Base64;
+            return resultado;
+        }
+        private static string GerarDocumentoRandom(string[] strParams)
+        {
+            var parametroTamanho = strParams[0];
+            int tamanhoKbs = 80;
+            if (!string.IsNullOrEmpty(parametroTamanho))
+            {
+                var parser = int.TryParse(parametroTamanho, out tamanhoKbs);
+                if (!parser)
+                {
+                    throw new CustomException(Models.TipoExcecao.NEGOCIO, "Não foi possível determinar o parâmetro informado.");
+                }
+            }
+
+            var geradorDeDocumento = new GeradorDocumentoMock();
+            var documento = geradorDeDocumento.GerarPDFComTamanhoDeTextoFixo(TipoDocumento.PDF, tamanhoKbs);
             var resultado = documento.Base64;
             return resultado;
         }
