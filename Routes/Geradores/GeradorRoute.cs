@@ -22,7 +22,7 @@ namespace GeradorDeDados.Routes.Geradores
           {
               var empresaReceitaWS = dadosReceitaWS.ObterDadosEmpresaRegistrada(filtroSocio, filtroSituacao, normalizado, excluirEmpresa);
               return Results.Ok(empresaReceitaWS);
-          }).WithTags("Geradores")
+          }).WithTags("Integração ReceitaWS")
               .WithOpenApi(options =>
               {
                   options.Summary = "Obtém um CNPJ aleatório ou filtrado e validado pela ReceitaWS";

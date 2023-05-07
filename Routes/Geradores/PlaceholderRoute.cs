@@ -23,16 +23,28 @@ namespace GeradorDeDados.Routes.Geradores
                     }
                     var resultado = placeHolder.ObterTexto(data);
                     return Results.Content(resultado);
-                }).WithTags("Geradores")
+                }).WithTags("Geradores placeholder")
                  .WithOpenApi(options =>
                  {
                      var placeholder = app.Services.GetRequiredService<Placeholder>();
-                     var descricao = placeholder.ObterDescricao();
+                     var descricao = placeholder.ObterDescricaoEmHtml();
                      options.Summary = "Permite criar um texto com o uso de placeholders.";
                      options.Description = $"{descricao}";
                      return options;
                  });
 
+            app.MapGet("/placeholder",
+                   [Authorize(AuthenticationSchemes = "ApiKey")]
+            (HttpRequest httpContext, [FromServices] Placeholder placeHolder) =>
+                   {
+                       var placeholders = placeHolder.ObterDescricaoDePlaceholders();
+                       return placeholders;
+                   }).WithTags("Geradores placeholder")
+                    .WithOpenApi(options =>
+                    {
+                        options.Summary = "Obtém uma lista de placeholders disponíveis.";
+                        return options;
+                    });
         }
     }
 }

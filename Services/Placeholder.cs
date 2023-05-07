@@ -5,6 +5,7 @@ using GeradorDeDados.Models;
 using GeradorDeDados.Services.Mocks;
 using StringPlaceholder;
 using StringPlaceholder.FluentPattern;
+using StringPlaceholder.Models;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -27,7 +28,12 @@ namespace GeradorDeDados.Services
             return novoTexto;
         }
 
-        public string ObterDescricao()
+        public IEnumerable<DescriptionModel> ObterDescricaoDePlaceholders()
+        {
+            var descricoes = executorCreator.GetDescription();
+            return descricoes;
+        }
+        public string ObterDescricaoEmHtml()
         {
             var descricaoPlaceholders = "Placeholders disponíveis:<br/><br/>";
             var descricoes = executorCreator.GetDescription();
