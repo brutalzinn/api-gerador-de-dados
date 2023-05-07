@@ -5,6 +5,9 @@ namespace GeradorDeDados.Services.Mocks
 {
     public interface IGeradorDocumentoMock
     {
-        DocumentoMock GerarDocumento(NomeDocumento tipoDocumento);
+        DocumentoMock GerarDocumento(TipoDocumento tipoDocumento);
+        DocumentoMock GerarImagemComPixelsRandom(TipoDocumento tipoDocumento);
+        DocumentoMock GerarPDFComTamanhoDeTextoFixo(TipoDocumento tipoDocumento, int loremIpsumEmKbs);
+
     }
 }

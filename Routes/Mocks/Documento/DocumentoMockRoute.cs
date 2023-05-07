@@ -10,10 +10,10 @@ namespace GeradorDeDados.Routes.Mocks.Documento
     {
         public static void CriarRota(this WebApplication app)
         {
-            app.MapGet("/mocks/obterdocumento/{nomeDocumento}",
-            ([FromRoute] NomeDocumento nomeDocumento, IGeradorDocumentoMock geradorDocumentoMock) =>
+            app.MapGet("/mocks/obterdocumento/{TipoDocumento}",
+            ([FromRoute] TipoDocumento TipoDocumento, IGeradorDocumentoMock geradorDocumentoMock) =>
             {
-                var documento = geradorDocumentoMock.GerarDocumento(nomeDocumento);
+                var documento = geradorDocumentoMock.GerarDocumento(TipoDocumento);
                 return documento;
             }).WithTags("Mocks")
             .WithOpenApi(options =>

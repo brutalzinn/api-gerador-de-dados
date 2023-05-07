@@ -22,15 +22,15 @@ namespace GeradorDeDados.Models
         AUTORIZACAO = 401,
         INTERNO = 500
     }
-    public enum NomeDocumento
+    public enum TipoDocumento
     {
-        [Description("selfie.jpg")]
+        [Description("selfie")]
         SELFIE = 1,
-        [Description("rg_frente.jpg")]
+        [Description("rg_frente")]
         RG_FRENTE,
-        [Description("rg_verso.jpg")]
+        [Description("rg_verso")]
         RG_VERSO,
-        [Description("lorem-ipsum.pdf")]
+        [Description("pdf")]
         PDF
     }
 }

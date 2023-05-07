@@ -12,7 +12,7 @@ namespace GeradorDeDados.Mocks.Utils
         /// <summary>
         /// chat gpt me deu uma mãozinha aqui.
         /// </summary>
-        public static string AddRandomDots(string imagePath)
+        public static string GenerateRandomDots(string imagePath)
         {
             if (File.Exists(imagePath) == false)
             {
