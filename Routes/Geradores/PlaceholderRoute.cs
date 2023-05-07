@@ -23,7 +23,7 @@ namespace GeradorDeDados.Routes.Geradores
                     }
                     var resultado = placeHolder.ObterTexto(data);
                     return Results.Content(resultado);
-                }).WithTags("Geradores placeholder")
+                }).WithTags("Mocks")
                  .WithOpenApi(options =>
                  {
                      var placeholder = app.Services.GetRequiredService<Placeholder>();
@@ -39,7 +39,7 @@ namespace GeradorDeDados.Routes.Geradores
                    {
                        var placeholders = placeHolder.ObterDescricaoDePlaceholders();
                        return placeholders;
-                   }).WithTags("Geradores placeholder")
+                   }).WithTags("Mocks")
                     .WithOpenApi(options =>
                     {
                         options.Summary = "Obtém uma lista de placeholders disponíveis.";
