@@ -16,6 +16,8 @@ internal class Program
         DependencyInjection.CriarInjecao(builder.Services);
         var app = builder.Build();
         var apiConfig = app.Services.GetRequiredService<IOptions<ApiConfig>>().Value;
+        app.UseCors("corsapp");
+
         app.UseAuthentication();
         app.UseAuthorization();
         app.AddCustomExceptionHandler();
@@ -24,7 +26,6 @@ internal class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-        app.UseCors("corsapp");
         ConfiguracaoRoute.CriarRota(app);
         GeradorRoute.CriarRota(app);
         PlaceholderRoute.CriarRota(app);

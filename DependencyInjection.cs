@@ -111,9 +111,14 @@ namespace GeradorDeDados
         {
             var serviceProvider = services.BuildServiceProvider();
             var apiConfig = serviceProvider.GetRequiredService<IOptions<ApiConfig>>().Value;
-            services.AddCors(p => p.AddPolicy("corsapp", builder =>
+            services.AddCors(p => p.AddPolicy("corsapp",
+            builder =>
             {
-                builder.WithOrigins(apiConfig.CorsOrigin).AllowAnyMethod().AllowAnyHeader();
+                builder
+                                .WithOrigins(apiConfig.CorsOrigin)
+
+                .AllowAnyMethod()
+                .AllowAnyHeader();
             }));
         }
 
