@@ -8,8 +8,18 @@ ENV TZ="America/Sao_Paulo"
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["assets/arial.ttf", "/usr/local/share/fonts/"]
-RUN dnf install -y fontconfig && fc-cache -f -v
+
+# force docker to install the ms core fonts.
+#https://github.com/ststeiger/PdfSharpCore/issues/161
+RUN echo "deb http://deb.debian.org/debian stable main contrib non-free" > /etc/apt/sources.list \
+    && echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections \
+    && apt-get update \
+    && apt-get install -y \
+    ttf-mscorefonts-installer \
+    && apt-get clean \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY ["GeradorDeDados.csproj", "."]
 RUN dotnet restore "./GeradorDeDados.csproj"
 COPY . .
