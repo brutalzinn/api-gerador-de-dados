@@ -8,6 +8,8 @@ ENV TZ="America/Sao_Paulo"
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
+COPY ["assets/arial.ttf", "/usr/local/share/fonts/"]
+RUN dnf install -y fontconfig && fc-cache -f -v
 COPY ["GeradorDeDados.csproj", "."]
 RUN dotnet restore "./GeradorDeDados.csproj"
 COPY . .
