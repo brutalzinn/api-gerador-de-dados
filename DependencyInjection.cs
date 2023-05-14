@@ -4,7 +4,6 @@ using GeradorDeDados.Authentication;
 using GeradorDeDados.Integrations.ReceitaWS;
 using GeradorDeDados.Models.Settings;
 using GeradorDeDados.Services;
-using GeradorDeDados.Services.Mocks;
 using GeradorDeDados.Works;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Caching.Distributed;
@@ -14,7 +13,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using RestEase.HttpClientFactory;
-using StringPlaceholder.FluentPattern;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
@@ -38,7 +36,6 @@ namespace GeradorDeDados
             services.InjetarAutenticacoes();
             services.InjetarServicosDeArmazenamento(config);
             services.InjetarServicos();
-            services.InjetarStringPlaceHolderService();
             services.InjetarSwagger();
             services.InjetarPoliticaCors();
         }
@@ -47,26 +44,12 @@ namespace GeradorDeDados
             services.AddAuthorization();
             services.AddSingleton<IRedisService, RedisService>();
             services.AddSingleton<IDadosReceitaWS, DadosReceitaWS>();
-            services.AddSingleton<IGeradorDocumentoMock, GeradorDocumentoMock>();
             services.AddHostedService<ReceitaWSWorker>();
             services.AddHostedService<ReceitaWSAutoFillWorker>();
             services.AddRestEaseClient<IReceitaWS>("https://receitaws.com.br");
             services.AddSingleton<ApiCicloDeVida>();
             services.AddSingleton<ReceitaWSConfig>();
 
-        }
-
-        private static void InjetarStringPlaceHolderService(this IServiceCollection services)
-        {
-            var serviceProvider = services.BuildServiceProvider();
-            var dadosReceitaWS = serviceProvider.GetRequiredService<IDadosReceitaWS>();
-
-            var stringPlaceHolder = new ExecutorCreator().Init()
-                .AddRange(Placeholder.ObterExecutores(dadosReceitaWS))
-                .BuildDescription();
-
-            services.AddSingleton<Placeholder>();
-            services.AddSingleton(stringPlaceHolder);
         }
         private static void InjetarAutenticacoes(this IServiceCollection services)
         {
@@ -115,8 +98,7 @@ namespace GeradorDeDados
             builder =>
             {
                 builder
-                                .WithOrigins(apiConfig.CorsOrigin)
-
+                .WithOrigins(apiConfig.CorsOrigin)
                 .AllowAnyMethod()
                 .AllowAnyHeader();
             }));
