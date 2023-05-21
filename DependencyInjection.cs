@@ -63,15 +63,10 @@ namespace GeradorDeDados
             var serviceProvider = services.BuildServiceProvider();
             var apiConfig = serviceProvider.GetRequiredService<IOptions<ApiConfig>>().Value;
             var cronParsed = CronExpression.Parse(apiConfig.CacheConfig.ExpireEvery);
-            var distributedCacheEntry = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration = cronParsed.GetNextOccurrence(DateTime.UtcNow),
-            };
-            services.AddSingleton(distributedCacheEntry);
             services.AddStackExchangeRedisCache(options =>
-            {
-                options.Configuration = ObterRedisContext();
-            });
+         {
+             options.Configuration = ObterRedisContext();
+         });
 
             string ObterRedisContext()
             {
